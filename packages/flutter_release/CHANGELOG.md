@@ -1,3 +1,8 @@
+## 0.2.2+1
+
+ - **FIX**: Source path when deploying to web server.
+ - **DOCS**: Code format in README.
+
 ## 0.2.2
 
  - **FEAT**: Use ssh controller.
