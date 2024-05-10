@@ -69,7 +69,8 @@ class WebServerDistributor extends PublishDistributor {
       );
 
       await serverConnection.upload(
-        sourcePath: tmpFolder,
+        // Must have a trailing slash to move folder contents only
+        sourcePath: '$tmpFolder/web/',
         webServerPath: webServerPath,
         isDryRun: flutterPublish.isDryRun,
       );
