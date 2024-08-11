@@ -1,3 +1,7 @@
+## 0.2.5
+
+ - **CI**: Publish from GitHub CI.
+
 ## 0.2.4
 
  - **REFACTOR**: Run deploy scripts without bash.

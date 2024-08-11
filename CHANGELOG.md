@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-08-11
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.5`](#dart_release---v025)
+ - [`flutter_release` - `v0.2.3`](#flutter_release---v023)
+
+---
+
+#### `dart_release` - `v0.2.5`
+
+ - **CI**: Publish from GitHub CI.
+
+#### `flutter_release` - `v0.2.3`
+
+ - **CI**: Publish from GitHub CI.
+
+
 ## 2024-05-01
 
 ### Changes
