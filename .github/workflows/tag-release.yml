@@ -16,3 +16,4 @@ jobs:
       - uses: Gustl22/melos-action@publish
         with:
           tag: true
+      - run: gh workflow run publish.yml
