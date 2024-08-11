@@ -1,21 +1,18 @@
-name: Publish packages
+name: Tag release
 on:
   push:
-    tags:
-      - '*'
+    branches: [main]
 
 jobs:
   publish-packages:
-    name: Publish packages
+    name: Create tag for a release
     permissions:
       contents: write
-      id-token: write # Required for authentication using OIDC
     runs-on: [ ubuntu-latest ]
+    if: contains(github.event.head_commit.message, 'chore(release)')
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
       - uses: Gustl22/melos-action@publish
         with:
-          publish: true
-          git-email: info@oberhauser.dev
-          git-name: Oberhauser Dev
+          tag: true
