@@ -1,3 +1,11 @@
+## 0.2.3-dev.0
+
+ - **REFACTOR**: Make FlutterPublish independent of FlutterBuild.
+ - **REFACTOR**: Split implementations per platform.
+ - **FEAT**: Use ssh controller.
+ - **FEAT**: Auto detect arch.
+ - **DOCS**: Adapt supported features.
+
 ## 0.2.2
 
  - **FEAT**: Use ssh controller.

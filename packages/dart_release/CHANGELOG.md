@@ -1,3 +1,15 @@
+## 0.2.5-dev.0
+
+ - **REFACTOR**: Run deploy scripts without bash.
+ - **FIX**: Set executable name only once on Windows.
+ - **FIX**: Propagate script paths on deploy.
+ - **FIX**: Provide ssh args with private key.
+ - **FIX**: Web server path.
+ - **FEAT**: Use ssh controller.
+ - **FEAT**: Option for build folder and executable name.
+ - **FEAT**(dart_release): Optional private key.
+ - **DOCS**: Adapt README.
+
 ## 0.2.4
 
  - **REFACTOR**: Run deploy scripts without bash.

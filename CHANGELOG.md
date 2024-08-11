@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-08-11
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.5-dev.0`](#dart_release---v025-dev0)
+ - [`flutter_release` - `v0.2.3-dev.0`](#flutter_release---v023-dev0)
+
+---
+
+#### `dart_release` - `v0.2.5-dev.0`
+
+ - **REFACTOR**: Run deploy scripts without bash.
+ - **FIX**: Set executable name only once on Windows.
+ - **FIX**: Propagate script paths on deploy.
+ - **FIX**: Provide ssh args with private key.
+ - **FIX**: Web server path.
+ - **FEAT**: Use ssh controller.
+ - **FEAT**: Option for build folder and executable name.
+ - **FEAT**(dart_release): Optional private key.
+ - **DOCS**: Adapt README.
+
+#### `flutter_release` - `v0.2.3-dev.0`
+
+ - **REFACTOR**: Make FlutterPublish independent of FlutterBuild.
+ - **REFACTOR**: Split implementations per platform.
+ - **FEAT**: Use ssh controller.
+ - **FEAT**: Auto detect arch.
+ - **DOCS**: Adapt supported features.
+
+
 ## 2024-05-01
 
 ### Changes
