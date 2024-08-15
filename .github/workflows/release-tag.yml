@@ -8,7 +8,6 @@ jobs:
     name: Create tag for a release
     permissions:
       contents: write
-      id-token: write # Required for authentication using OIDC
     runs-on: [ ubuntu-latest ]
     if: contains(github.event.head_commit.message, 'chore(release)')
     steps:
@@ -17,6 +16,3 @@ jobs:
       - uses: Gustl22/melos-action@publish
         with:
           tag: true
-      - run: gh workflow run publish.yml
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
