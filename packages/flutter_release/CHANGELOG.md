@@ -1,3 +1,7 @@
+## 0.2.4
+
+ - **CI**: Publish from GitHub CI.
+
 ## 0.2.3
 
  - **CI**: Publish from GitHub CI.
