@@ -22,24 +22,11 @@ Packages with other changes:
 
 #### `dart_release` - `v0.2.6`
 
- - **REFACTOR**: Run deploy scripts without bash.
- - **FIX**: Set executable name only once on Windows.
- - **FIX**: Propagate script paths on deploy.
- - **FIX**: Provide ssh args with private key.
- - **FIX**: Web server path.
- - **FEAT**: Use ssh controller.
- - **FEAT**: Option for build folder and executable name.
- - **FEAT**(dart_release): Optional private key.
- - **DOCS**: Adapt README.
+ - **CI**: Publish from GitHub CI.
 
 #### `flutter_release` - `v0.2.4`
 
- - **REFACTOR**: Make FlutterPublish independent of FlutterBuild.
- - **REFACTOR**: Split implementations per platform.
- - **FEAT**: Use ssh controller.
- - **FEAT**: Auto detect arch.
- - **DOCS**: Code format in README.
- - **DOCS**: Adapt supported features.
+ - **CI**: Publish from GitHub CI.
 
 
 ## 2024-08-11
