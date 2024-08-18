@@ -1,12 +1,6 @@
 ## 0.2.5
 
- - **REFACTOR**: Make FlutterPublish independent of FlutterBuild.
- - **REFACTOR**: Split implementations per platform.
- - **FIX**: Source path when deploying to web server.
- - **FEAT**: Use ssh controller.
- - **FEAT**: Auto detect arch.
- - **DOCS**: Code format in README.
- - **DOCS**: Adapt supported features.
+ - **CI**: Publish from GitHub CI.
 
 ## 0.2.4
 
