@@ -1,14 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:material_duration_picker/material_duration_picker.dart';
 
-void main() => runApp(const TestDurationApp());
+void main() => runApp(const DurationPickerApp());
 
-class TestDurationApp extends StatelessWidget {
-  const TestDurationApp({super.key});
+class DurationPickerApp extends StatelessWidget {
+  const DurationPickerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        DefaultDurationPickerMaterialLocalizations.delegate,
+      ],
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
