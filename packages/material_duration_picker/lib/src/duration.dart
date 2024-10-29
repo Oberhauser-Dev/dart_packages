@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 /// A [RestorableValue] that knows how to save and restore [Duration].
 ///
@@ -49,7 +48,7 @@ extension DurationExtension on Duration {
 
   /// Extract the second remainder.
   int get second => inSeconds % 60;
-  
+
   /// Extract the minute remainder.
   int get minute => inMinutes % 60;
 
@@ -87,6 +86,7 @@ enum DurationFormat {
   /// This format uses 24-hour two-digit zero-padded hours. Controls are always
   /// laid out horizontally. Hours are separated from minutes by one colon
   /// character.
+  // ignore: constant_identifier_names
   HH_colon_mm,
 
   /// Corresponds to the ICU 'HH.mm' pattern.
@@ -94,6 +94,7 @@ enum DurationFormat {
   /// This format uses 24-hour two-digit zero-padded hours. Controls are always
   /// laid out horizontally. Hours are separated from minutes by one dot
   /// character.
+  // ignore: constant_identifier_names
   HH_dot_mm,
 
   /// Corresponds to the ICU "HH 'h' mm" pattern used in Canadian French.
@@ -107,6 +108,7 @@ enum DurationFormat {
   /// This format uses 24-hour non-padded variable-length hours. Controls are
   /// always laid out horizontally. Hours are separated from minutes by one
   /// colon character.
+  // ignore: constant_identifier_names
   H_colon_mm,
 }
 

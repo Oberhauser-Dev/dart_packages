@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_duration_picker/material_duration_picker.dart';
@@ -30,15 +32,18 @@ class Home extends StatelessWidget {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 IconButton(
-                  icon: const Icon(Icons.access_time),
+                  icon: const Icon(Icons.timelapse),
                   onPressed: () {
-                    showTimePicker(
+                    showDurationPicker(
+                      durationPickerMode: DurationPickerMode.ms,
                       context: context,
-                      initialTime: TimeOfDay.now(),
+                      initialDuration: Duration.zero,
                     );
                   },
                 ),
@@ -46,8 +51,33 @@ class Home extends StatelessWidget {
                   icon: const Icon(Icons.timelapse),
                   onPressed: () {
                     showDurationPicker(
+                      durationPickerMode: DurationPickerMode.hms,
                       context: context,
                       initialDuration: Duration.zero,
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.timelapse),
+                  onPressed: () {
+                    showDurationPicker(
+                      durationPickerMode: DurationPickerMode.ms,
+                      context: context,
+                      initialDuration: Duration.zero,
+                    );
+                  },
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.access_time),
+                  onPressed: () {
+                    showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
                     );
                   },
                 ),
@@ -71,61 +101,48 @@ class Home extends StatelessWidget {
                 ),
               ],
             ),
-            Row(
-              children: [
-                TimePickerDialog(
-                  initialTime: TimeOfDay.now(),
-                ),
-                TimePickerDialog(
-                  initialEntryMode: TimePickerEntryMode.input,
-                  initialTime: TimeOfDay.now(),
-                ),
-              ],
+            const Divider(),
+            const DurationPickerDialog(
+              durationPickerMode: DurationPickerMode.hm,
+              initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
             ),
-            const Row(
-              children: [
-                DurationPickerDialog(
-                  durationPickerMode: DurationPickerMode.hm,
-                  initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
-                ),
-                DurationPickerDialog(
-                  durationPickerMode: DurationPickerMode.hm,
-                  initialEntryMode: DurationPickerEntryMode.input,
-                  initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
-                ),
-              ],
+            const DurationPickerDialog(
+              durationPickerMode: DurationPickerMode.hm,
+              initialEntryMode: DurationPickerEntryMode.input,
+              initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
             ),
-            const Row(
-              children: [
-                DurationPickerDialog(
-                  durationPickerMode: DurationPickerMode.hms,
-                  initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
-                ),
-                DurationPickerDialog(
-                  durationPickerMode: DurationPickerMode.hms,
-                  initialEntryMode: DurationPickerEntryMode.input,
-                  initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
-                ),
-              ],
+            const DurationPickerDialog(
+              durationPickerMode: DurationPickerMode.hms,
+              initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
             ),
-            const Row(
-              children: [
-                DurationPickerDialog(
-                  durationPickerMode: DurationPickerMode.ms,
-                  initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
-                ),
-                DurationPickerDialog(
-                  durationPickerMode: DurationPickerMode.ms,
-                  initialEntryMode: DurationPickerEntryMode.input,
-                  initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
-                ),
-              ],
+            const DurationPickerDialog(
+              durationPickerMode: DurationPickerMode.hms,
+              initialEntryMode: DurationPickerEntryMode.input,
+              initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
             ),
+            const DurationPickerDialog(
+              durationPickerMode: DurationPickerMode.ms,
+              initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
+            ),
+            const DurationPickerDialog(
+              durationPickerMode: DurationPickerMode.ms,
+              initialEntryMode: DurationPickerEntryMode.input,
+              initialDuration: Duration(hours: 1, minutes: 30, seconds: 45),
+            ),
+            const Divider(),
             CupertinoTimerPicker(
               mode: CupertinoTimerPickerMode.hms,
               onTimerDurationChanged: (Duration value) {
-                print(value);
+                developer.log(value.toString());
               },
+            ),
+            const Divider(),
+            TimePickerDialog(
+              initialTime: TimeOfDay.now(),
+            ),
+            TimePickerDialog(
+              initialEntryMode: TimePickerEntryMode.input,
+              initialTime: TimeOfDay.now(),
             ),
           ],
         ),

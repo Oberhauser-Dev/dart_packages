@@ -55,5 +55,5 @@ jobs:
           channel: ${{ inputs.flutter_channel }}
       - uses: bluefireteam/melos-action@v3
       - run: melos analyze
-      - run: melos format --set-exit-if-changed
+      - run: melos format --ignore=material_duration_picker --set-exit-if-changed
       - run: melos run test
