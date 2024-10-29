@@ -6,5 +6,5 @@ packages:
 
 scripts:
   test:
-    run: melos exec dart test
+    run: melos exec flutter test
     description: Run all Flutter tests in this project.

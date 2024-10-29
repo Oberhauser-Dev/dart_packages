@@ -1,6 +1,6 @@
 # example
 
-A new Flutter project.
+Example project to test `material_duration_picker`.
 
 ## Getting Started
 
