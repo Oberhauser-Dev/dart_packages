@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-10-30
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`material_duration_picker` - `v0.0.2-dev.0`](#material_duration_picker---v002-dev0)
+
+---
+
+#### `material_duration_picker` - `v0.0.2-dev.0`
+
+ - **REFACTOR**: Rename docs to doc.
+ - **REFACTOR**: Apply analysis proposals.
+ - **FEAT**: Make package compatible with former Dart 3.4.x.
+ - **FEAT**: Localizations.
+ - **FEAT**: Provide implementation (time_picker at flutter/flutter[#360](https://github.com/Oberhauser-dev/dart_packages/issues/360)e42c).
+ - **FEAT**: Initial package material_duration_picker.
+ - **DOCS**: Add example.
+
+
 ## 2024-08-18
 
 ### Changes
