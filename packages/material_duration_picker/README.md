@@ -4,7 +4,7 @@ A duration picker using the material (M3) design guidelines of the [time picker]
 
 ## Features
 
-![duration_picker.gif](docs/images/duration_picker.gif)
+![duration_picker.gif](doc/images/duration_picker.gif)
 
 ## Getting started
 
