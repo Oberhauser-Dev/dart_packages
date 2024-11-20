@@ -58,6 +58,7 @@ class DeployCommand extends Command {
       buildFolder: results[argBuildFolder] as String?,
       executableName: results[argExecName] as String?,
       releaseFolder: results[argReleaseFolder] as String?,
+      dartSdkPath: results[argDartSdkPath] as String?,
     );
 
     final deploy = getDeploy(
