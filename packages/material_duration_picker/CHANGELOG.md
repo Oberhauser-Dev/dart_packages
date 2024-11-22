@@ -1,3 +1,7 @@
+## 0.0.2+1
+
+ - **FIX**: Parse versions starting with 'v' ([#13](https://github.com/Oberhauser-dev/dart_packages/issues/13)).
+
 ## 0.0.2
 
  - **REFACTOR**: Rename docs to doc.

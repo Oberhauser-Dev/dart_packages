@@ -1,3 +1,8 @@
+## 0.2.6
+
+ - **FIX**: Parse versions starting with 'v' ([#13](https://github.com/Oberhauser-dev/dart_packages/issues/13)).
+ - **FEAT**: Support flavors/schemes on ios ([#12](https://github.com/Oberhauser-dev/dart_packages/issues/12)).
+
 ## 0.2.5
 
  - **CI**: Publish from GitHub CI.
