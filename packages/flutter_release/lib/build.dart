@@ -1,45 +1,78 @@
 import 'dart:io';
 
 import 'package:dart_release/utils.dart';
+import 'package:pub_semver/pub_semver.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 /// Class which holds the necessary attributes to perform a build on various
 /// platforms for the specified [buildType].
 class FlutterBuild {
-  final String appName;
-  final String appVersion;
-  String buildVersion;
-  int buildNumber;
+  late final String appName;
+  late final String appVersion;
+  late Version buildVersion;
+  late int buildNumber;
   List<String> buildArgs;
+  final String? mainPath;
   final String releaseFolder;
   final bool installDeps;
+  final String flutterSdkPath;
 
   FlutterBuild({
-    required this.appName,
+    String? appName,
     String? appVersion,
     String? buildVersion,
     int? buildNumber,
+    this.mainPath,
     this.buildArgs = const [],
     this.installDeps = true,
     String? releaseFolder,
-  })  : appVersion = appVersion ?? 'v0.0.1',
-        buildVersion =
-            buildVersion ?? (appVersion ?? 'v0.0.1').replaceFirst('v', ''),
-        buildNumber = buildNumber ?? 0,
-        releaseFolder = releaseFolder ?? 'build/releases';
+    String? flutterSdkPath,
+  })  : flutterSdkPath = flutterSdkPath ?? 'flutter',
+        releaseFolder = releaseFolder ?? 'build/releases' {
+    final pubspecStr = File('pubspec.yaml').readAsStringSync();
+    final pubspec = Pubspec.parse(pubspecStr);
+    if (appVersion == null && buildVersion == null) {
+      this.buildVersion = pubspec.version ?? Version(0, 0, 1);
+      this.appVersion = 'v${this.buildVersion.canonicalizedVersion}';
+    } else if (buildVersion != null) {
+      this.buildVersion = Version.parse(buildVersion);
+      this.appVersion = 'v${this.buildVersion.canonicalizedVersion}';
+    } else {
+      this.buildVersion = Version.parse(appVersion!);
+      this.appVersion = appVersion;
+    }
+
+    if (buildNumber == null) {
+      this.buildNumber =
+          this.buildVersion.build.whereType<int>().firstOrNull ?? 0;
+    } else {
+      this.buildNumber = buildNumber;
+    }
+
+    if (appName == null) {
+      this.appName = pubspec.name;
+    } else {
+      this.appName = appName;
+    }
+  }
 
   /// Build the flutter binaries for the platform given in [buildCmd].
   Future<void> build({required String buildCmd}) async {
     await Directory(releaseFolder).create(recursive: true);
     await runProcess(
-      'flutter',
+      flutterSdkPath,
       [
         'build',
         buildCmd,
         '--build-name',
-        buildVersion,
+        buildVersion.canonicalizedVersion,
         '--build-number',
         buildNumber.toString(),
         ...buildArgs,
+        if (mainPath != null) ...[
+          '-t',
+          mainPath!,
+        ]
       ],
       printCall: true,
       // Must run in shell to correctly resolve paths on Windows

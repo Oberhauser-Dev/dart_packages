@@ -9,8 +9,8 @@ Build:
 
 ```shell
 flutter_release build apk \
- --app-name example \
- --app-version v0.0.1-alpha.1 \
+ --app-name example \ # Using name in pubspec by default
+ --app-version v0.0.1-alpha.1 \ # Using version in pubspec by default
  --build-arg=--dart-define=API_URL=https://example.com \
  --build-arg=--dart-define=API_KEY=12345678
 ```
@@ -21,7 +21,7 @@ Publish:
 flutter_release publish android-google-play \
  --dry-run \
  --stage internal \
- --app-name wrestling_scoreboard_client \
+ --app-name example \
  --app-version v0.0.1-alpha.1 \
  --build-arg=--dart-define=API_URL=https://example.com \
  --build-arg=--dart-define=API_KEY=12345678 \
@@ -113,7 +113,7 @@ Support for other app distributors is planned.
    ```shell
    flutter_release publish ios-app-store \
     --dry-run \
-    --app-name wrestling_scoreboard_client \
+    --app-name example \
     --app-version v0.0.1-alpha.1 \
     --build-arg=--dart-define=API_URL=https://example.com \
     --build-arg=--dart-define=API_KEY=12345678 \
@@ -123,9 +123,21 @@ Support for other app distributors is planned.
     --api-private-key-base64=<api-private-key> \
     --content-provider-id=<itc_team_id> \
     --team-id=<team_id> \
-    --distribution-private-key-base64=<distribution-private-key>
+    --distribution-private-key-base64=<distribution-private-key> \
+    --distribution-cert-base64=<distribution-cert>
    ```
    Optionally add the `--team-enterprise` flag, if your team is in the Apple Developer Enterprise Program.
+   For flavor support add:
+   ```shell
+    --build-arg=--flavor=prod \
+    --xcode-scheme prod \ # Using "Runner" by default
+    --main-path lib/main_prod.dart \ # Using "lib/main.dart" by default
+   ```
+
+To create additional provisioning profiles, run in the `ios` directory:
+```
+fastlane sigh -a com.example.ios.to.be.added --api_key_path ApiAuth.json
+```
 
 ### Web - Server (via Debian only)
 
@@ -136,7 +148,7 @@ Support for other app distributors is planned.
    ```shell
    flutter_release publish web-server \
     --dry-run \
-    --app-name wrestling_scoreboard_client \
+    --app-name example \
     --app-version v0.0.1-alpha.1 \
     --build-arg=--dart-define=API_URL=https://example.com \
     --build-arg=--dart-define=API_KEY=12345678 \

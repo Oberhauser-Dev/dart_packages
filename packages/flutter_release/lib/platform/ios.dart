@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
 import 'package:flutter_release/publish.dart';
+import 'package:pub_semver/pub_semver.dart';
 
 Future<String> generateApiKeyJson({
   required String apiPrivateKeyBase64,
@@ -39,7 +41,14 @@ class IosSigningPrepare {
     await brewInstallFastlane();
 
     if (!(await File('$_fastlaneDirectory/Appfile').exists())) {
-      throw 'Please execute `cd ios && fastlane release` once.';
+      await runProcess(
+        'fastlane',
+        [
+          'release',
+        ],
+        workingDirectory: _iosDirectory,
+      );
+      print('Created fastlane config in `ios` directory.');
     }
 
     final iosDir = Directory(_iosDirectory);
@@ -55,12 +64,18 @@ class IosSigningPrepare {
       throw 'Please generate an App Store connect API Team key and copy it into the `ios` folder, see https://appstoreconnect.apple.com/access/integrations/api .';
     }
 
+    print(
+        'Enter your personal apple ID / username (apple_id, exported as IOS_APPLE_USERNAME):');
+    final appleUsername = readInput();
+
     final apiPrivateKeyFileName = apiPrivateKeyFile.uri.pathSegments.last;
     final apiKeyId = apiPrivateKeyFileName.substring(
         'AuthKey_'.length, apiPrivateKeyFileName.indexOf('.p8'));
-    print('The API Key id is (api-key-id):\n$apiKeyId\n');
+    print(
+        'The API Key id is (api-key-id, exported as IOS_API_KEY_ID):\n$apiKeyId\n');
 
-    print('Enter the issuer id of the API key (api-issuer-id):');
+    print(
+        'Enter the issuer id of the API key (api-issuer-id, exported as IOS_API_ISSUER_ID):');
     final apiIssuerId = readInput();
 
     print('Is the team enterprise y/n (team-enterprise, default:"n"):');
@@ -107,24 +122,73 @@ class IosSigningPrepare {
             .firstWhere((file) => file.uri.pathSegments.last.endsWith('.cer'));
       }
 
+      final certType = isDevelopment ? 'Development' : 'Distribution';
+
       final p12PrivateKeyBase64 =
           base64Encode(await File.fromUri(privateKeyFile.uri).readAsBytes());
       print(
-          'Base64 Private Key for ${isDevelopment ? 'Development' : 'Distribution'} (${isDevelopment ? 'development' : 'distribution'}-private-key-base64):\n');
+          'Base64 Private Key for $certType (${certType.toLowerCase()}-private-key-base64, exported as IOS_${certType.toUpperCase()}_PRIVATE_KEY):\n');
       print('$p12PrivateKeyBase64\n');
 
       final certBase64 =
           base64Encode(await File.fromUri(certFile.uri).readAsBytes());
       print(
-          'Base64 Certificate for ${isDevelopment ? 'Development' : 'Distribution'} (${isDevelopment ? 'development' : 'distribution'}-cert-base64):\n');
+          'Base64 Certificate for $certType (${certType.toLowerCase()}-cert-base64, exported as IOS_${certType.toUpperCase()}_CERT):\n');
       print('$certBase64\n');
+
+      await runProcess(
+        'export',
+        [
+          'IOS_${certType.toUpperCase()}_PRIVATE_KEY=$p12PrivateKeyBase64',
+          'IOS_${certType.toUpperCase()}_CERT=$certBase64',
+        ],
+      );
     }
 
     print(
-        'Base64 Private Key for App Store connect API (api-private-key-base64):\n');
+        'Enter your content provider id (team_id, exported as IOS_TEAM_ID), see https://developer.apple.com/account#MembershipDetailsCard:');
+    final teamId = readInput();
+
+    print(
+        'Enter your content provider id (itc_team_id, exported as IOS_CONTENT_PROVIDER_ID), see https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/detail:');
+    final contentProviderId = readInput();
+
+    print(
+        'Base64 Private Key for App Store connect API (api-private-key-base64, exported as IOS_API_PRIVATE_KEY):\n');
     print('$apiPrivateKeyBase64\n');
 
     await handleCertificate(isDevelopment: false);
+
+    await runProcess(
+      'export',
+      [
+        'IOS_APPLE_USERNAME=$appleUsername',
+        'IOS_API_KEY_ID=$apiKeyId',
+        'IOS_API_ISSUER_ID=$apiIssuerId',
+        'IOS_API_PRIVATE_KEY=$apiPrivateKeyBase64',
+        'IOS_CONTENT_PROVIDER_ID=$contentProviderId',
+        'IOS_TEAM_ID=$teamId',
+      ],
+    );
+
+    var exampleCommand = r'''
+flutter_release publish ios-app-store \
+  --dry-run \
+  --app-name my_app \ # Optional
+  --app-version v0.0.1-alpha.1 \ # Optional
+  --stage internal \
+  --apple-username=$IOS_APPLE_USERNAME \
+  --api-key-id=$IOS_API_KEY_ID \
+  --api-issuer-id=$IOS_API_ISSUER_ID \
+  --api-private-key-base64=$IOS_API_PRIVATE_KEY \
+  --content-provider-id=$IOS_CONTENT_PROVIDER_ID \
+  --team-id=$IOS_TEAM_ID \
+  --distribution-private-key-base64=$IOS_DISTRIBUTION_PRIVATE_KEY \
+  --distribution-cert-base64=$IOS_DISTRIBUTION_CERT''';
+    if (isTeamEnterprise) {
+      exampleCommand += ' --team-enterprise';
+    }
+    print(exampleCommand);
   }
 }
 
@@ -195,6 +259,8 @@ class IosAppStoreDistributor extends PublishDistributor {
   final String teamId;
   final bool isTeamEnterprise;
   final String distributionPrivateKeyBase64;
+  final bool updateProvisioning;
+  final String xcodeScheme;
 
   /// This may can be removed once getting certificates is implemented in fastlane
   /// https://developer.apple.com/documentation/appstoreconnectapi/list_and_download_certificates
@@ -209,10 +275,14 @@ class IosAppStoreDistributor extends PublishDistributor {
     required this.apiPrivateKeyBase64,
     required this.contentProviderId,
     required this.teamId,
-    bool? isTeamEnterprise,
+    required bool? isTeamEnterprise,
     required this.distributionPrivateKeyBase64,
     required this.distributionCertificateBase64,
+    required bool? updateProvisioning,
+    String? xcodeScheme,
   })  : isTeamEnterprise = isTeamEnterprise ?? false,
+        updateProvisioning = updateProvisioning ?? false,
+        xcodeScheme = xcodeScheme ?? 'Runner',
         super(distributorType: PublishDistributorType.iosAppStore);
 
   @override
@@ -226,14 +296,41 @@ class IosAppStoreDistributor extends PublishDistributor {
     // Create tmp keychain to be able to run non interactively,
     // see https://github.com/fastlane/fastlane/blob/df12128496a9a0ad349f8cf8efe6f9288612f2cb/fastlane/lib/fastlane/actions/setup_ci.rb#L37
     final fastlaneKeychainName = 'fastlane_tmp_keychain';
-    await runProcess(
+    var result = await runProcess(
       'fastlane',
       [
         'run',
-        'setup_ci',
+        'is_ci',
       ],
       workingDirectory: _iosDirectory,
     );
+    final isCi = result.exitCode > 0;
+    if (isCi) {
+      await runProcess(
+        'fastlane',
+        [
+          'run',
+          'setup_ci',
+        ],
+        workingDirectory: _iosDirectory,
+      );
+    } else {
+      print('Not on CI: Create keychain "$fastlaneKeychainName" manually.');
+      await runProcess(
+        'fastlane',
+        [
+          'run',
+          'create_keychain',
+          'name:$fastlaneKeychainName',
+          'default_keychain:true',
+          'unlock:true',
+          'timeout:3600',
+          'lock_when_sleeps:true',
+          'password:',
+        ],
+        workingDirectory: _iosDirectory,
+      );
+    }
 
     // Determine app bundle id
     final iosAppInfoFile =
@@ -324,6 +421,8 @@ team_id("$teamId")
         'fastlane',
         [
           'sigh',
+          'download_all',
+          if (isDevelopment) '--development',
           // get_provisioning_profile
           //'filename:$signingIdentity.mobileprovision', // only works for newly created profiles
           '--api_key_path',
@@ -332,35 +431,72 @@ team_id("$teamId")
         workingDirectory: _iosDirectory,
       );
 
-      final provisioningProfilePath =
-          '${isDevelopment ? 'Development' : 'AppStore'}_$bundleId.mobileprovision';
+      final iosDir = Directory(_iosDirectory);
+      final entities = await iosDir.list().toList();
+      Iterable<FileSystemEntity> provisioningProfilePaths =
+          entities.where((file) {
+        final fileName = file.uri.pathSegments.last;
+        return fileName.endsWith('.mobileprovision');
+      });
 
-      // Install provisioning profile
-      await runProcess(
-        'fastlane',
-        [
-          'run',
-          'install_provisioning_profile',
-          'path:$provisioningProfilePath',
-        ],
-        workingDirectory: _iosDirectory,
-      );
+      for (var provisioningProfilePath in provisioningProfilePaths) {
+        final filePath = provisioningProfilePath.uri.pathSegments.last;
+        final fileName = filePath.replaceAll('.mobileprovision', '');
+        final provisionParams = fileName.split('_');
+        final provisionIsDevelopment = provisionParams[0] != 'AppStore';
+        if (provisionIsDevelopment != isDevelopment) continue;
+        final provisionBundleId =
+            provisionParams[provisionParams.length > 2 ? 2 : 1];
 
-      // Update provisioning profile
-      await runProcess(
-        'fastlane',
-        [
-          'run',
-          'update_project_provisioning',
-          'xcodeproj:Runner.xcodeproj',
-          // 'build_configuration:${isDevelopment ? '/Debug|Profile/gm' : 'Release'}',
-          // 'build_configuration:${isDevelopment ? 'Debug' : 'Release'}',
-          // 'profile:./$signingIdentity.mobileprovision', // Custom name only working for newly created profiles
-          'profile:$provisioningProfilePath',
-          'code_signing_identity:$codeSigningIdentity',
-        ],
-        workingDirectory: _iosDirectory,
-      );
+        // Install provisioning profile
+        await runProcess(
+          'fastlane',
+          [
+            'run',
+            'install_provisioning_profile',
+            'path:$filePath',
+          ],
+          workingDirectory: _iosDirectory,
+        );
+
+        if (!updateProvisioning) continue;
+
+        // Update provisioning profile
+        // Need to get the target (product) name of the bundle ids in order to update the provisioning profiles.
+        // As there's no easy way to do this in fastlane, a script handles this.
+        final getBundleIdFromProductRubyUri = Uri.parse(
+            'package:flutter_release/fastlane/get_bundle_id_product.rb');
+        final getBundleIdFromProductRubyFile =
+            await Isolate.resolvePackageUri(getBundleIdFromProductRubyUri);
+        result = await runProcess(
+          'ruby',
+          [
+            getBundleIdFromProductRubyFile!.path,
+            'Runner.xcodeproj',
+            provisionBundleId,
+          ],
+          workingDirectory: _iosDirectory,
+        );
+        final target = result.stdout.trim();
+        print('Target "$target" has bundle id "$provisionBundleId"');
+
+        result = await runProcess(
+          'fastlane',
+          [
+            'run',
+            'update_project_provisioning',
+            'xcodeproj:Runner.xcodeproj',
+            // 'build_configuration:${isDevelopment ? '/Debug|Profile/gm' : 'Release'}',
+            // 'build_configuration:${isDevelopment ? 'Debug' : 'Release'}',
+            'target_filter:${target.replaceAll('.', '\\.')}',
+            'profile:$filePath',
+            'code_signing_identity:$codeSigningIdentity',
+          ],
+          workingDirectory: _iosDirectory,
+        );
+        print('Updating provisioning profile $filePath ($provisionBundleId)');
+        print(result.stdout);
+      }
     }
 
     // await installCertificates(isDevelopment: true);
@@ -383,15 +519,9 @@ team_id("$teamId")
       final buildVersion = platformBuild.flutterBuild.buildVersion;
       // Remove semver suffix
       // See: https://github.com/flutter/flutter/issues/27589
-      if (buildVersion.contains('+')) {
-        platformBuild.flutterBuild.buildVersion = buildVersion.split('+')[0];
-        print(
-          'Build version was truncated from $buildVersion to '
-          '${platformBuild.flutterBuild.buildVersion} as required by app store',
-        );
-      }
-      if (buildVersion.contains('-')) {
-        platformBuild.flutterBuild.buildVersion = buildVersion.split('-')[0];
+      if (buildVersion.isPreRelease || buildVersion.build.isNotEmpty) {
+        platformBuild.flutterBuild.buildVersion =
+            Version(buildVersion.major, buildVersion.minor, buildVersion.patch);
         print(
           'Build version was truncated from $buildVersion to '
           '${platformBuild.flutterBuild.buildVersion} as required by app store',
@@ -402,13 +532,25 @@ team_id("$teamId")
     // Build xcarchive only
     await platformBuild.build();
 
+    print('Build via flutter command finished. '
+        'This usually fails using the provisioning profiles.\n'
+        'Therefore the app is now build again with fastlane. '
+        'See: https://docs.flutter.dev/deployment/cd, '
+        'and https://github.com/flutter/flutter/issues/106612');
+
     // Build signed ipa
     // https://docs.flutter.dev/deployment/cd
+    // https://github.com/flutter/flutter/issues/106612
+
+    print('Using XCode scheme "$xcodeScheme" to build the project.');
+
     await runProcess(
+      printCall: true,
       'fastlane',
       [
         'run',
         'build_app',
+        'scheme:$xcodeScheme',
         'skip_build_archive:true',
         'archive_path:../build/ios/archive/Runner.xcarchive',
       ],
@@ -435,6 +577,17 @@ team_id("$teamId")
           printCall: true,
         );
       }
+    }
+    if (isCi) {
+      await runProcess(
+        'fastlane',
+        [
+          'run',
+          'delete_keychain',
+          'name:$fastlaneKeychainName',
+        ],
+        workingDirectory: _iosDirectory,
+      );
     }
   }
 }

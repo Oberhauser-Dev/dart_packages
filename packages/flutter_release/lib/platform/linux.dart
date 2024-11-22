@@ -74,7 +74,8 @@ class LinuxPlatformBuild extends PlatformBuild {
 
     final flutterArch = getFlutterCpuArchitecture(arch);
     final pathToFile = await FlutterToDebian.runBuild(
-        version: flutterBuild.buildVersion, arch: flutterArch);
+        version: flutterBuild.buildVersion.canonicalizedVersion,
+        arch: flutterArch);
 
     final artifactPath = flutterBuild.getArtifactPath(
         platform: 'linux', arch: arch, extension: 'deb');

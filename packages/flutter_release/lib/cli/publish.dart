@@ -28,6 +28,8 @@ const argIosTeamId = 'team-id';
 const argIosTeamEnterprise = 'team-enterprise';
 const argIosDistributionPrivateKeyBase64 = 'distribution-private-key-base64';
 const argIosDistributionCertificateBase64 = 'distribution-cert-base64';
+const argIosUpdateProvisioning = 'update-provisioning';
+const argXcodeScheme = 'xcode-scheme';
 
 // Publish: Web Server
 const commandWebServer = 'web-server';
@@ -78,11 +80,13 @@ abstract class CommonPublishCommand extends Command {
     );
 
     final flutterBuild = FlutterBuild(
-      appName: results[argAppName] as String,
+      appName: results[argAppName] as String?,
       appVersion: results[argAppVersion] as String?,
       buildNumber: int.tryParse(results[argBuildNumber] ?? ''),
       buildVersion: results[argBuildVersion] as String?,
       buildArgs: results[argBuildArg] as List<String>,
+      mainPath: results[argMainPath] as String?,
+      flutterSdkPath: results[argFlutterSdkPath] as String?,
     );
 
     final publishDistributor = getPublishDistributor(
@@ -157,7 +161,13 @@ class PublishIosAppStoreCommand extends CommonPublishCommand {
       ..addOption(argIosTeamId, mandatory: true, help: 'aka `team_id`')
       ..addFlag(argIosTeamEnterprise, help: 'aka `in_house`')
       ..addOption(argIosDistributionPrivateKeyBase64, mandatory: true)
-      ..addOption(argIosDistributionCertificateBase64, mandatory: true);
+      ..addOption(argIosDistributionCertificateBase64, mandatory: true)
+      ..addOption(argIosUpdateProvisioning,
+          help:
+              'fetch all provisioning profiles and try to match them with the bundle ids')
+      ..addOption(argXcodeScheme,
+          help: 'Scheme in XCode to build the project (useful for flavors). '
+              'By default it will use the "Runner" scheme.');
   }
 
   @override
@@ -185,6 +195,8 @@ class PublishIosAppStoreCommand extends CommonPublishCommand {
           results[argIosDistributionPrivateKeyBase64] as String,
       distributionCertificateBase64:
           results[argIosDistributionCertificateBase64] as String,
+      updateProvisioning: results[argIosUpdateProvisioning] as bool?,
+      xcodeScheme: results[argXcodeScheme] as String?,
     );
   }
 }

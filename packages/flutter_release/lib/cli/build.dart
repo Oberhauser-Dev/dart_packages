@@ -11,6 +11,7 @@ const argAppVersion = 'app-version';
 const argBuildNumber = 'build-number';
 const argBuildVersion = 'build-version';
 const argBuildArg = 'build-arg';
+const argMainPath = 'main-path';
 const argReleaseFolder = 'release-folder';
 
 // Build
@@ -21,6 +22,7 @@ const argKeyStoreFileBase64 = 'keystore-file-base64';
 const argKeyStorePassword = 'keystore-password';
 const argKeyAlias = 'key-alias';
 const argKeyPassword = 'key-password';
+const argFlutterSdkPath = 'flutter-sdk-path';
 
 class BuildCommand extends Command {
   @override
@@ -43,10 +45,12 @@ class BuildCommand extends Command {
 
 void addBuildArgs(ArgParser parser) {
   parser
-    ..addOption(argAppName, abbr: 'n', mandatory: true)
+    ..addOption(argAppName, abbr: 'n')
+    ..addOption(argMainPath, abbr: 'm')
     ..addOption(argAppVersion, abbr: 'v')
     ..addOption(argBuildNumber, abbr: 'b')
     ..addOption(argBuildVersion)
+    ..addOption(argFlutterSdkPath)
     ..addMultiOption(argBuildArg, abbr: 'o');
 }
 
@@ -68,12 +72,14 @@ abstract class CommonBuildCommand extends Command {
     final results = argResults;
     if (results == null) throw ArgumentError('No arguments provided');
     final flutterBuild = FlutterBuild(
-      appName: results[argAppName] as String,
+      appName: results[argAppName] as String?,
       appVersion: results[argAppVersion] as String?,
       buildNumber: int.tryParse(results[argBuildNumber] ?? ''),
       buildVersion: results[argBuildVersion] as String?,
       buildArgs: results[argBuildArg] as List<String>,
+      mainPath: results[argMainPath] as String?,
       releaseFolder: results[argReleaseFolder] as String?,
+      flutterSdkPath: results[argFlutterSdkPath] as String?,
     );
     final platformBuild = getPlatformBuild(results, flutterBuild);
     stdout.writeln(await platformBuild.build());

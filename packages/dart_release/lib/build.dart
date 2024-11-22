@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:dart_release/utils/platform.dart';
 import 'package:dart_release/utils/process.dart';
+import 'package:pub_semver/pub_semver.dart';
+import 'package:pubspec_parse/pubspec_parse.dart';
 
 /// Class which holds the necessary attributes to perform a build on various
 /// platforms for the specified [buildType].
 class DartBuild {
-  final String appName;
-  final String appVersion;
+  late final String appName;
+  late final String appVersion;
   final String mainPath;
   List<String> buildArgs;
   final String releaseFolder;
@@ -15,9 +17,10 @@ class DartBuild {
   late final String executableName;
   late final String _arch;
   final List<String> includedPaths;
+  final String dartSdkPath;
 
   DartBuild({
-    required this.appName,
+    String? appName,
     required this.mainPath,
     String? appVersion,
     this.buildArgs = const [],
@@ -25,12 +28,28 @@ class DartBuild {
     List<String>? includedPaths,
     String? buildFolder,
     String? executableName,
-  })  : appVersion = appVersion ?? 'v0.0.1',
+    String? dartSdkPath,
+  })  : dartSdkPath = dartSdkPath ?? 'dart',
         releaseFolder = releaseFolder ?? 'build/releases',
         includedPaths = includedPaths ?? [] {
     _arch = getCpuArchitecture();
+    final pubspecStr = File('pubspec.yaml').readAsStringSync();
+    final pubspec = Pubspec.parse(pubspecStr);
+
+    if (appVersion == null) {
+      this.appVersion =
+          'v${(pubspec.version ?? Version(0, 0, 1)).canonicalizedVersion}';
+    } else {
+      this.appVersion = appVersion;
+    }
+
+    if (appName == null) {
+      this.appName = pubspec.name;
+    } else {
+      this.appName = appName;
+    }
     if (executableName == null) {
-      String execName = appName.replaceAll('_', '-');
+      String execName = this.appName.replaceAll('_', '-');
       if (Platform.isWindows) {
         execName += '.exe';
       }
@@ -50,7 +69,7 @@ class DartBuild {
     await Directory(buildFolder).create(recursive: true);
     final executable = '$buildFolder/$executableName';
     await runProcess(
-      'dart',
+      dartSdkPath,
       [
         'compile',
         'exe',
