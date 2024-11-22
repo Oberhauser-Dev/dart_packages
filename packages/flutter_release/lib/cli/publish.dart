@@ -195,7 +195,8 @@ class PublishIosAppStoreCommand extends CommonPublishCommand {
           results[argIosDistributionPrivateKeyBase64] as String,
       distributionCertificateBase64:
           results[argIosDistributionCertificateBase64] as String,
-      updateProvisioning: results[argIosUpdateProvisioning] as bool?,
+      updateProvisioning:
+          bool.parse(results[argIosUpdateProvisioning] ?? 'false'),
       xcodeScheme: results[argXcodeScheme] as String?,
     );
   }
