@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-11-22
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.8`](#dart_release---v028)
+ - [`flutter_release` - `v0.2.6`](#flutter_release---v026)
+ - [`material_duration_picker` - `v0.0.2+1`](#material_duration_picker---v0021)
+
+---
+
+#### `dart_release` - `v0.2.8`
+
+ - **FEAT**: Support flavors/schemes on ios ([#12](https://github.com/Oberhauser-dev/dart_packages/issues/12)).
+
+#### `flutter_release` - `v0.2.6`
+
+ - **FIX**: Parse iosUpdateProvisioning string as bool ([#15](https://github.com/Oberhauser-dev/dart_packages/issues/15)).
+ - **FIX**: Parse versions starting with 'v' ([#13](https://github.com/Oberhauser-dev/dart_packages/issues/13)).
+ - **FEAT**: Support flavors/schemes on ios ([#12](https://github.com/Oberhauser-dev/dart_packages/issues/12)).
+
+#### `material_duration_picker` - `v0.0.2+1`
+
+ - **FIX**: Parse versions starting with 'v' ([#13](https://github.com/Oberhauser-dev/dart_packages/issues/13)).
+
+
 ## 2024-10-30
 
 ### Changes

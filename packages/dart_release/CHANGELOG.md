@@ -1,3 +1,7 @@
+## 0.2.8
+
+ - **FEAT**: Support flavors/schemes on ios ([#12](https://github.com/Oberhauser-dev/dart_packages/issues/12)).
+
 ## 0.2.7
 
  - **CI**: Publish from GitHub CI.
