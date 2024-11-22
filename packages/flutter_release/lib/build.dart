@@ -38,7 +38,7 @@ class FlutterBuild {
       this.buildVersion = Version.parse(buildVersion);
       this.appVersion = 'v${this.buildVersion.canonicalizedVersion}';
     } else {
-      this.buildVersion = Version.parse(appVersion!);
+      this.buildVersion = Version.parse(appVersion!.replaceFirst('v', ''));
       this.appVersion = appVersion;
     }
 
