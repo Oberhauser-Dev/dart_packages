@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:dart_release/cli/build.dart';
 import 'package:dart_release/dart_release.dart';
 import 'package:flutter_release/flutter_release.dart';
 
@@ -55,7 +56,7 @@ class PublishCommand extends Command {
 
 abstract class CommonPublishCommand extends Command {
   CommonPublishCommand() {
-    addBuildArgs(argParser);
+    addFlutterReleaseBuildArgs(argParser);
     argParser.addOption(argPublishStage);
     argParser.addFlag(argDryRun);
   }
@@ -82,8 +83,9 @@ abstract class CommonPublishCommand extends Command {
     final flutterBuild = FlutterBuild(
       appName: results[argAppName] as String?,
       appVersion: results[argAppVersion] as String?,
-      buildNumber: int.tryParse(results[argBuildNumber] ?? ''),
       buildVersion: results[argBuildVersion] as String?,
+      buildMetadata: results[argBuildMetadata] as String?,
+      buildPreRelease: results[argBuildPreRelease] as String?,
       buildArgs: results[argBuildArg] as List<String>,
       mainPath: results[argMainPath] as String?,
       flutterSdkPath: results[argFlutterSdkPath] as String?,

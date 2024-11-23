@@ -10,7 +10,6 @@ class FlutterBuild {
   late final String appName;
   late final String appVersion;
   late Version buildVersion;
-  late int buildNumber;
   List<String> buildArgs;
   final String? mainPath;
   final String releaseFolder;
@@ -21,7 +20,8 @@ class FlutterBuild {
     String? appName,
     String? appVersion,
     String? buildVersion,
-    int? buildNumber,
+    String? buildPreRelease,
+    String? buildMetadata,
     this.mainPath,
     this.buildArgs = const [],
     this.installDeps = true,
@@ -31,22 +31,19 @@ class FlutterBuild {
         releaseFolder = releaseFolder ?? 'build/releases' {
     final pubspecStr = File('pubspec.yaml').readAsStringSync();
     final pubspec = Pubspec.parse(pubspecStr);
-    if (appVersion == null && buildVersion == null) {
-      this.buildVersion = pubspec.version ?? Version(0, 0, 1);
-      this.appVersion = 'v${this.buildVersion.canonicalizedVersion}';
-    } else if (buildVersion != null) {
-      this.buildVersion = Version.parse(buildVersion);
-      this.appVersion = 'v${this.buildVersion.canonicalizedVersion}';
-    } else {
-      this.buildVersion = Version.parse(appVersion!.replaceFirst('v', ''));
-      this.appVersion = appVersion;
-    }
 
-    if (buildNumber == null) {
-      this.buildNumber =
-          this.buildVersion.build.whereType<int>().firstOrNull ?? 0;
+    this.buildVersion = resolveVersion(
+      pubspecVersion: pubspec.version,
+      appVersion: appVersion,
+      buildVersion: buildVersion,
+      buildPreRelease: buildPreRelease,
+      buildMetadata: buildMetadata,
+    );
+
+    if (appVersion != null) {
+      this.appVersion = appVersion;
     } else {
-      this.buildNumber = buildNumber;
+      this.appVersion = 'v${this.buildVersion.canonicalizedVersion}';
     }
 
     if (appName == null) {
@@ -59,15 +56,27 @@ class FlutterBuild {
   /// Build the flutter binaries for the platform given in [buildCmd].
   Future<void> build({required String buildCmd}) async {
     await Directory(releaseFolder).create(recursive: true);
+    var buildName =
+        '${buildVersion.major}.${buildVersion.minor}.${buildVersion.patch}';
+    if (buildVersion.preRelease.isNotEmpty) {
+      buildName +=
+          '-${buildVersion.preRelease.map((p) => p.toString()).join('.')}';
+    }
+    String? buildNumber;
+    if (buildVersion.build.isNotEmpty) {
+      buildNumber = buildVersion.build.map((p) => p.toString()).join('.');
+    }
     await runProcess(
       flutterSdkPath,
       [
         'build',
         buildCmd,
         '--build-name',
-        buildVersion.canonicalizedVersion,
-        '--build-number',
-        buildNumber.toString(),
+        buildName,
+        if (buildNumber != null) ...[
+          '--build-number',
+          buildNumber,
+        ],
         ...buildArgs,
         if (mainPath != null) ...[
           '-t',

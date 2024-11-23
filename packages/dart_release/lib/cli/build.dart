@@ -8,6 +8,8 @@ import 'package:dart_release/dart_release.dart';
 // Common
 const argAppName = 'app-name';
 const argAppVersion = 'app-version';
+const argBuildMetadata = 'build-metadata';
+const argBuildPreRelease = 'build-pre-release';
 const argBuildArg = 'build-arg';
 const argMainPath = 'main-path';
 const argIncludePath = 'include-path';
@@ -26,7 +28,7 @@ class BuildCommand extends Command {
   final description = 'Build the app in the specified format.';
 
   BuildCommand() {
-    addBuildArgs(argParser);
+    addDartReleaseBuildArgs(argParser);
   }
 
   @override
@@ -36,6 +38,8 @@ class BuildCommand extends Command {
     final dartBuild = DartBuild(
       appName: results[argAppName] as String?,
       appVersion: results[argAppVersion] as String?,
+      buildMetadata: results[argBuildMetadata] as String?,
+      buildPreRelease: results[argBuildPreRelease] as String?,
       buildArgs: results[argBuildArg] as List<String>,
       mainPath: results[argMainPath] as String,
       includedPaths: results[argIncludePath] as List<String>,
@@ -48,10 +52,12 @@ class BuildCommand extends Command {
   }
 }
 
-void addBuildArgs(ArgParser parser) {
+void addDartReleaseBuildArgs(ArgParser parser) {
   parser
     ..addOption(argAppName, abbr: 'n')
     ..addOption(argAppVersion, abbr: 'v')
+    ..addOption(argBuildMetadata, abbr: 'b')
+    ..addOption(argBuildPreRelease)
     ..addOption(argMainPath, abbr: 'm', mandatory: true)
     ..addMultiOption(argIncludePath, abbr: 'i')
     ..addMultiOption(argBuildArg, abbr: 'o')

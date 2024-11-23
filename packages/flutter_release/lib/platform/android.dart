@@ -206,7 +206,10 @@ package_name("$packageName")
 
     print('Build application...');
     if (versionCode != null) {
-      platformBuild.flutterBuild.buildNumber = versionCode;
+      platformBuild.flutterBuild.buildVersion =
+          platformBuild.flutterBuild.buildVersion.copyWith(
+        build: versionCode.toString(),
+      );
     }
     final outputPath = await platformBuild.build();
     final outputFile = File(outputPath);
