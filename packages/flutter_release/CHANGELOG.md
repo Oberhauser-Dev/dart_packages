@@ -1,3 +1,7 @@
+## 0.2.7
+
+ - **FEAT**: Support build metadata and pre-release ([#17](https://github.com/Oberhauser-dev/dart_packages/issues/17)).
+
 ## 0.2.6
 
  - **FIX**: Parse iosUpdateProvisioning string as bool ([#15](https://github.com/Oberhauser-dev/dart_packages/issues/15)).
