@@ -49,7 +49,7 @@ MY_BASE_64="${MY_BASE_64//$'\n'/}"
 
 - `app-name`: The name of the app executable
 - `app-version`: Semantic version of the release (like `v1.2.3`), see https://semver.org/
-- `build-number`: Specify the build number (also used as version code for Android, but is handled automatically)
+- `build-metadata`: Specify the build number (also used as version code for Android, but is handled automatically)
 - `build-type`: Release one of the following options: `apk`, `web`, `ipk`, `macos`, `windows`, `debian`
 - `build-arg`: Add options such as `--dart-define` to the flutter build command
 

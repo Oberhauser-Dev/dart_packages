@@ -3,19 +3,11 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
+import 'package:dart_release/cli/build.dart';
 import 'package:flutter_release/flutter_release.dart';
 
 // Common
-const argAppName = 'app-name';
-const argAppVersion = 'app-version';
-const argBuildNumber = 'build-number';
 const argBuildVersion = 'build-version';
-const argBuildArg = 'build-arg';
-const argMainPath = 'main-path';
-const argReleaseFolder = 'release-folder';
-
-// Build
-const commandBuild = 'build';
 
 // Build Android
 const argKeyStoreFileBase64 = 'keystore-file-base64';
@@ -43,20 +35,21 @@ class BuildCommand extends Command {
   }
 }
 
-void addBuildArgs(ArgParser parser) {
+void addFlutterReleaseBuildArgs(ArgParser parser) {
   parser
     ..addOption(argAppName, abbr: 'n')
     ..addOption(argMainPath, abbr: 'm')
     ..addOption(argAppVersion, abbr: 'v')
-    ..addOption(argBuildNumber, abbr: 'b')
     ..addOption(argBuildVersion)
+    ..addOption(argBuildMetadata, abbr: 'b')
+    ..addOption(argBuildPreRelease)
     ..addOption(argFlutterSdkPath)
     ..addMultiOption(argBuildArg, abbr: 'o');
 }
 
 abstract class CommonBuildCommand extends Command {
   CommonBuildCommand() {
-    addBuildArgs(argParser);
+    addFlutterReleaseBuildArgs(argParser);
     argParser.addOption(argReleaseFolder);
   }
 
@@ -74,8 +67,9 @@ abstract class CommonBuildCommand extends Command {
     final flutterBuild = FlutterBuild(
       appName: results[argAppName] as String?,
       appVersion: results[argAppVersion] as String?,
-      buildNumber: int.tryParse(results[argBuildNumber] ?? ''),
       buildVersion: results[argBuildVersion] as String?,
+      buildMetadata: results[argBuildMetadata] as String?,
+      buildPreRelease: results[argBuildPreRelease] as String?,
       buildArgs: results[argBuildArg] as List<String>,
       mainPath: results[argMainPath] as String?,
       releaseFolder: results[argReleaseFolder] as String?,

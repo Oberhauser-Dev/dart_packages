@@ -26,7 +26,7 @@ class DeployCommand extends Command {
   final description = 'Deploy the app with the specified distributor.';
 
   DeployCommand() {
-    addBuildArgs(argParser);
+    addDartReleaseBuildArgs(argParser);
     argParser.addFlag(argDryRun);
     argParser.addOption(argWebServerHost);
     argParser.addOption(argWebServerPort);
@@ -52,6 +52,8 @@ class DeployCommand extends Command {
     final dartBuild = DartBuild(
       appName: results[argAppName] as String,
       appVersion: results[argAppVersion] as String?,
+      buildMetadata: results[argBuildMetadata] as String?,
+      buildPreRelease: results[argBuildPreRelease] as String?,
       buildArgs: results[argBuildArg] as List<String>,
       mainPath: results[argMainPath] as String,
       includedPaths: results[argIncludePath] as List<String>,

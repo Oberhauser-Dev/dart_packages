@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dart_release/utils/platform.dart';
 import 'package:dart_release/utils/process.dart';
-import 'package:pub_semver/pub_semver.dart';
+import 'package:dart_release/utils/version.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 
 /// Class which holds the necessary attributes to perform a build on various
@@ -23,6 +23,8 @@ class DartBuild {
     String? appName,
     required this.mainPath,
     String? appVersion,
+    String? buildPreRelease,
+    String? buildMetadata,
     this.buildArgs = const [],
     String? releaseFolder,
     List<String>? includedPaths,
@@ -36,11 +38,18 @@ class DartBuild {
     final pubspecStr = File('pubspec.yaml').readAsStringSync();
     final pubspec = Pubspec.parse(pubspecStr);
 
-    if (appVersion == null) {
-      this.appVersion =
-          'v${(pubspec.version ?? Version(0, 0, 1)).canonicalizedVersion}';
-    } else {
+    final buildVersion = resolveVersion(
+      pubspecVersion: pubspec.version,
+      appVersion: appVersion,
+      buildVersion: null,
+      buildPreRelease: buildPreRelease,
+      buildMetadata: buildMetadata,
+    );
+
+    if (appVersion != null) {
       this.appVersion = appVersion;
+    } else {
+      this.appVersion = 'v${buildVersion.canonicalizedVersion}';
     }
 
     if (appName == null) {
