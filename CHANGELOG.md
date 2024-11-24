@@ -15,6 +15,34 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`dart_release` - `v0.2.9+2`](#dart_release---v0292)
+ - [`flutter_release` - `v0.2.7+2`](#flutter_release---v0272)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `flutter_release` - `v0.2.7+2`
+
+---
+
+#### `dart_release` - `v0.2.9+2`
+
+ - **FIX**: Set null correctly in Version.copyWith method.
+
+
+## 2024-11-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`dart_release` - `v0.2.9+1`](#dart_release---v0291)
  - [`flutter_release` - `v0.2.7+1`](#flutter_release---v0271)
 
