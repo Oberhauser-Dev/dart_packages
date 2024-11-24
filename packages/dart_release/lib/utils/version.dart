@@ -45,7 +45,7 @@ extension VersionExt on Version {
       pre: pre == _undefined
           ? (preRelease.isNotEmpty
               ? preRelease.map((p) => p.toString()).join('.')
-              : pre)
+              : null)
           : pre,
       build: build == _undefined
           ? (this.build.isNotEmpty
