@@ -1,3 +1,7 @@
+## 0.2.7+2
+
+ - Update a dependency to the latest release.
+
 ## 0.2.7+1
 
  - **FIX**: Omit build-metadata on Android/iOS if not a number ([#19](https://github.com/Oberhauser-dev/dart_packages/issues/19)).

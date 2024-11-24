@@ -1,3 +1,7 @@
+## 0.2.9+2
+
+ - **FIX**: Set null correctly in Version.copyWith method.
+
 ## 0.2.9+1
 
  - **FIX**: Omit build-metadata on Android/iOS if not a number ([#19](https://github.com/Oberhauser-dev/dart_packages/issues/19)).
