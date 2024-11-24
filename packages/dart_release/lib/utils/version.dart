@@ -27,26 +27,31 @@ Version resolveVersion({
   return version;
 }
 
+// Used to work around: https://github.com/dart-lang/language/issues/2232
+const _undefined = 'undefined';
+
 extension VersionExt on Version {
   Version copyWith({
     int? major,
     int? minor,
     int? patch,
-    String? pre,
-    String? build,
+    String? pre = _undefined,
+    String? build = _undefined,
   }) {
     return Version(
       major ?? this.major,
       minor ?? this.minor,
       patch ?? this.patch,
-      pre: pre ??
-          (preRelease.isNotEmpty
+      pre: pre == _undefined
+          ? (preRelease.isNotEmpty
               ? preRelease.map((p) => p.toString()).join('.')
-              : null),
-      build: build ??
-          (this.build.isNotEmpty
+              : pre)
+          : pre,
+      build: build == _undefined
+          ? (this.build.isNotEmpty
               ? this.build.map((b) => b.toString()).join('.')
-              : null),
+              : null)
+          : build,
     );
   }
 }

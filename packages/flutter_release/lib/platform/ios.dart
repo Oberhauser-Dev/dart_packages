@@ -201,7 +201,7 @@ class IosPlatformBuild extends PlatformBuild {
 
   /// Build the artifact for iOS App Store. It creates a .ipa bundle.
   Future<String> _buildIosApp() async {
-    // TODO: build signed app, independently from publish.
+    // TODO: Signing without App Store not feasible at the moment
     await flutterBuild.build(buildCmd: 'ios');
 
     final artifactPath =
@@ -237,6 +237,15 @@ class IosPlatformBuild extends PlatformBuild {
   /// Build the artifact for iOS. Not supported as it requires signing.
   @override
   Future<String> build() async {
+    final buildMetadata =
+        flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
+    if (int.tryParse(buildMetadata) == null) {
+      print(
+          'Non integer values for build metadata are not supported on iOS. Omitting "$buildMetadata".');
+      flutterBuild.buildVersion =
+          flutterBuild.buildVersion.copyWith(build: null);
+    }
+
     return switch (buildType) {
       BuildType.ios => _buildIosApp(),
       BuildType.ipa => _buildIosIpa(),

@@ -80,6 +80,15 @@ storeFile=${keyStoreFile.absolute.path}
           .writeAsString(signingKeys);
     }
 
+    final buildMetadata =
+        flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
+    if (int.tryParse(buildMetadata) == null) {
+      print(
+          'Non integer values for build metadata are not supported on Android. Omitting "$buildMetadata".');
+      flutterBuild.buildVersion =
+          flutterBuild.buildVersion.copyWith(build: null);
+    }
+
     return switch (buildType) {
       BuildType.aab => _buildAndroidAab(),
       BuildType.apk => _buildAndroidApk(),
