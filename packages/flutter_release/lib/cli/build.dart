@@ -200,13 +200,23 @@ class MacOsBuildCommand extends CommonBuildCommand {
 }
 
 abstract class IosBuildCommand extends CommonBuildCommand {
+  static void addIosBuildArgs(ArgParser argParser) {
+    // TODO: Signing without App Store not feasible at the moment
+  }
+
   @override
   PlatformBuild getPlatformBuild(
       ArgResults results, FlutterBuild flutterBuild) {
+    // TODO: Signing without App Store not feasible at the moment
+    flutterBuild.buildArgs.add('--no-codesign');
     return IosPlatformBuild(
       buildType: buildType,
       flutterBuild: flutterBuild,
     );
+  }
+
+  IosBuildCommand() {
+    addIosBuildArgs(argParser);
   }
 }
 
