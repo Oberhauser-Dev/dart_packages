@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-11-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.9+1`](#dart_release---v0291)
+ - [`flutter_release` - `v0.2.7+1`](#flutter_release---v0271)
+
+---
+
+#### `dart_release` - `v0.2.9+1`
+
+ - **FIX**: Omit build-metadata on Android/iOS if not a number ([#19](https://github.com/Oberhauser-dev/dart_packages/issues/19)).
+
+#### `flutter_release` - `v0.2.7+1`
+
+ - **FIX**: Omit build-metadata on Android/iOS if not a number ([#19](https://github.com/Oberhauser-dev/dart_packages/issues/19)).
+
+
 ## 2024-11-23
 
 ### Changes
