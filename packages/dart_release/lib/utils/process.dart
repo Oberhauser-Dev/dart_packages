@@ -29,6 +29,34 @@ Future<ProcessResult> runProcess(
   return result;
 }
 
+Future<Process> runAsyncProcess(
+  String executable,
+  List<String> arguments, {
+  String? workingDirectory,
+  Map<String, String>? environment,
+  bool includeParentEnvironment = true,
+  bool runInShell = false,
+  bool printCall = false,
+}) async {
+  if (printCall) {
+    print('$executable ${arguments.join(' ')}');
+  }
+  final result = await Process.start(
+    executable,
+    arguments,
+    workingDirectory: workingDirectory,
+    environment: environment,
+    includeParentEnvironment: includeParentEnvironment,
+    runInShell: runInShell,
+  );
+  stdout.addStream(result.stdout);
+  stderr.addStream(result.stderr);
+  if (await result.exitCode != 0) {
+    throw Exception('Process "$executable" failed. See log above.');
+  }
+  return result;
+}
+
 Future<ProcessResult> runBash(
   String executable,
   List<String> arguments, {

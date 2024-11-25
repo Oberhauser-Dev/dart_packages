@@ -66,7 +66,7 @@ class FlutterBuild {
     if (buildVersion.build.isNotEmpty) {
       buildNumber = buildVersion.build.map((p) => p.toString()).join('.');
     }
-    await runProcess(
+    await runAsyncProcess(
       flutterSdkPath,
       [
         'build',
@@ -81,7 +81,7 @@ class FlutterBuild {
         if (mainPath != null) ...[
           '-t',
           mainPath!,
-        ]
+        ],
       ],
       printCall: true,
       // Must run in shell to correctly resolve paths on Windows
