@@ -84,8 +84,10 @@ storeFile=${keyStoreFile.absolute.path}
     final buildMetadata =
         flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
     if (int.tryParse(buildMetadata) == null) {
-      print(
-          'Non integer values for build metadata are not supported on Android. Omitting "$buildMetadata".');
+      if (buildMetadata.isNotEmpty) {
+        print(
+            'Non integer values for build metadata are not supported on Android. Omitting "$buildMetadata".');
+      }
       flutterBuild.buildVersion =
           flutterBuild.buildVersion.copyWith(build: null);
     }
