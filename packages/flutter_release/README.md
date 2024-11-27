@@ -68,7 +68,7 @@ Support for other app distributors is planned.
 
 1. Create an App in your [Google Play Console](https://play.google.com/console).
 2. Make sure you have these files ignored in your `./android/.gitignore`:
-   ```
+   ```gitignore
    key.properties
    **/*.keystore
    **/*.jks
@@ -82,21 +82,34 @@ Support for other app distributors is planned.
    Convert the keystore to a base64 string e.g. `base64 --wrap=0 android/keystore.jks`
 4. Follow the guide of fastlane
    for [setting up supply](https://docs.fastlane.tools/getting-started/android/setup/#setting-up-supply).
-5. Convert the Google Play Store credentials json to base64 e.g. `base64 --wrap=0 android/fastlane-secrets.json`
+   No need to add the path to the Fastlane AppFile (as it should not exist at this point).
+5. Convert the Google Play Store credentials json (downloaded from cloud.google.com) to base64 e.g. `base64 --wrap=0 android/fastlane-secrets.json`
 6. Manually build a signed app bundle and publish it on the Google Play Store at least once to be able to automate the
    process, e.g.:
-   ```
+   ```shell
    flutter build appbundle \
-    --release \
-    --build-name=0.0.1-beta.10 \
-    --dart-define=API_URL=https://example.com \
-    --dart-define=API_KEY=12345678
+    --release
+   ```
+7. Run flutter_release
+   ```shell
+   flutter_release publish android-google-play \
+    --dry-run \
+    --stage internal \
+    --fastlane-secrets-json-base64=$(base64 --wrap=0 android/fastlane-secrets.json) \
+    --keystore-file-base64=$(base64 --wrap=0 android/keystore.jks) \
+    --keystore-password=<mykeystorepassword> \
+    --key-alias=<mykeyalias>
+   ```
+   For flavor support add:
+   ```shell
+    --build-arg=--flavor=prod \
+    --main-path lib/main_prod.dart # Using "lib/main.dart" by default
    ```
 
 ### iOS - App Store
 
 1. Make sure you have these files ignored in your `./ios/.gitignore`:
-   ```
+   ```gitignore
    *.cer
    *.certSigningRequest
    *.mobileprovision
@@ -113,10 +126,6 @@ Support for other app distributors is planned.
    ```shell
    flutter_release publish ios-app-store \
     --dry-run \
-    --app-name example \
-    --app-version v0.0.1-alpha.1 \
-    --build-arg=--dart-define=API_URL=https://example.com \
-    --build-arg=--dart-define=API_KEY=12345678 \
     --apple-username=<apple_id> \
     --api-key-id=<api-key-id> \
     --api-issuer-id=<api-issuer-id> \
@@ -131,7 +140,7 @@ Support for other app distributors is planned.
    ```shell
     --build-arg=--flavor=prod \
     --xcode-scheme prod \ # Using "Runner" by default
-    --main-path lib/main_prod.dart \ # Using "lib/main.dart" by default
+    --main-path lib/main_prod.dart # Using "lib/main.dart" by default
    ```
 
 To create additional provisioning profiles, run in the `ios` directory:
@@ -148,10 +157,6 @@ fastlane sigh -a com.example.ios.to.be.added --api_key_path ApiAuth.json
    ```shell
    flutter_release publish web-server \
     --dry-run \
-    --app-name example \
-    --app-version v0.0.1-alpha.1 \
-    --build-arg=--dart-define=API_URL=https://example.com \
-    --build-arg=--dart-define=API_KEY=12345678 \
     --host=host.example.com \
     --path=/var/www/html \
     --ssh-port=22 \
