@@ -555,7 +555,7 @@ team_id("$teamId")
 
     print('Using XCode scheme "$xcodeScheme" to build the project.');
 
-    await runProcess(
+    await runAsyncProcess(
       printCall: true,
       'fastlane',
       [
