@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
+import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
 
 /// Build the app for Android.
@@ -181,27 +182,18 @@ package_name("$packageName")
     };
 
     Future<int?> getLastVersionCode() async {
-      final result = await runProcess(
-        'fastlane',
+      final versionCodesStr = await runFastlaneProcess(
         [
           'run',
           'google_play_track_version_codes',
           // 'package_name: app_identifier',
           'track:$track',
         ],
-        environment: {'FASTLANE_DISABLE_COLORS': '1'},
         workingDirectory: _androidDirectory,
       );
 
       // Get latest version code
-      const splitter = LineSplitter();
-      final lines = splitter.convert(result.stdout);
-      final resultSearchStr = 'Result:';
-      final versionCodesStr = lines.last
-          .substring(
-            lines.last.indexOf(resultSearchStr) + resultSearchStr.length,
-          )
-          .trim();
+      if (versionCodesStr == null) return null;
       final json = jsonDecode(versionCodesStr);
       return json[0] as int?;
     }
@@ -210,7 +202,7 @@ package_name("$packageName")
     // Increase versionCode by 1, if available:
     versionCode = versionCode == null ? null : (versionCode + 1);
     print(
-      'Use $versionCode as next version code unless build number is overridden.',
+      'Use "$versionCode" as next version code unless build number is overridden.',
     );
 
     print('Build application...');

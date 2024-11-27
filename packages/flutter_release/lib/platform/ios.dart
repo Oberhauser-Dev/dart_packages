@@ -5,6 +5,7 @@ import 'dart:isolate';
 import 'package:collection/collection.dart';
 import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
+import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
 import 'package:pub_semver/pub_semver.dart';
 
@@ -305,15 +306,14 @@ class IosAppStoreDistributor extends PublishDistributor {
     // Create tmp keychain to be able to run non interactively,
     // see https://github.com/fastlane/fastlane/blob/df12128496a9a0ad349f8cf8efe6f9288612f2cb/fastlane/lib/fastlane/actions/setup_ci.rb#L37
     final fastlaneKeychainName = 'fastlane_tmp_keychain';
-    var result = await runProcess(
-      'fastlane',
+    final resultStr = await runFastlaneProcess(
       [
         'run',
         'is_ci',
       ],
       workingDirectory: _iosDirectory,
     );
-    final isCi = result.exitCode > 0;
+    final isCi = bool.parse(resultStr ?? 'false');
     if (isCi) {
       await runProcess(
         'fastlane',
@@ -477,7 +477,7 @@ team_id("$teamId")
             'package:flutter_release/fastlane/get_bundle_id_product.rb');
         final getBundleIdFromProductRubyFile =
             await Isolate.resolvePackageUri(getBundleIdFromProductRubyUri);
-        result = await runProcess(
+        var result = await runProcess(
           'ruby',
           [
             getBundleIdFromProductRubyFile!.path,
