@@ -587,17 +587,16 @@ team_id("$teamId")
         );
       }
     }
-    if (isCi) {
-      await runProcess(
-        'fastlane',
-        [
-          'run',
-          'delete_keychain',
-          'name:$fastlaneKeychainName',
-        ],
-        workingDirectory: _iosDirectory,
-      );
-    }
+    // Clean up
+    await runProcess(
+      'fastlane',
+      [
+        'run',
+        'delete_keychain',
+        'name:$fastlaneKeychainName',
+      ],
+      workingDirectory: _iosDirectory,
+    );
   }
 }
 
