@@ -1,3 +1,7 @@
+## 0.2.10
+
+ - **FEAT**: Run flutter command asynchronously.
+
 ## 0.2.9+2
 
  - **FIX**: Set null correctly in Version.copyWith method.

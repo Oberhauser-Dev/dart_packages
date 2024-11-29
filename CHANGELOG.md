@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-11-29
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.10`](#dart_release---v0210)
+ - [`flutter_release` - `v0.2.8`](#flutter_release---v028)
+
+---
+
+#### `dart_release` - `v0.2.10`
+
+ - **FEAT**: Run flutter command asynchronously.
+
+#### `flutter_release` - `v0.2.8`
+
+ - **FIX**: Always clean fastlane keychain.
+ - **FIX**: Parse fastlane results correctly.
+ - **FEAT**: Run fastlane command asynchronously.
+ - **FEAT**: Only print build metadata when necessary.
+ - **FEAT**: Run flutter command asynchronously.
+ - **DOCS**: Adapt README.md.
+
+
 ## 2024-11-24
 
 ### Changes
