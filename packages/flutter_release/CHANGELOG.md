@@ -1,3 +1,12 @@
+## 0.2.8
+
+ - **FIX**: Always clean fastlane keychain.
+ - **FIX**: Parse fastlane results correctly.
+ - **FEAT**: Run fastlane command asynchronously.
+ - **FEAT**: Only print build metadata when necessary.
+ - **FEAT**: Run flutter command asynchronously.
+ - **DOCS**: Adapt README.md.
+
 ## 0.2.7+2
 
  - Update a dependency to the latest release.
