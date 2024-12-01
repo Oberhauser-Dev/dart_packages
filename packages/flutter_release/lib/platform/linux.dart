@@ -4,6 +4,7 @@ import 'package:dart_release/utils.dart';
 import 'package:flutter_release/flutter_release.dart';
 import 'package:flutter_release/tool_installation.dart';
 import 'package:flutter_to_debian/flutter_to_debian.dart';
+import 'package:path/path.dart' as path;
 
 /// Build the app for Linux.
 class LinuxPlatformBuild extends PlatformBuild {
@@ -38,7 +39,10 @@ class LinuxPlatformBuild extends PlatformBuild {
       await ensureInstalled('liblzma-dev');
     }
 
-    await flutterBuild.build(buildCmd: 'linux');
+    var filePath = await flutterBuild.build(buildCmd: 'linux');
+    if (filePath != null) {
+      filePath = path.dirname(filePath);
+    }
 
     final artifactPath = flutterBuild.getArtifactPath(
       platform: 'linux',
@@ -52,7 +56,7 @@ class LinuxPlatformBuild extends PlatformBuild {
         '-czf',
         artifactPath,
         '-C',
-        'build/linux/$flutterArch/release/bundle',
+        filePath ?? 'build/linux/$flutterArch/release/bundle',
         '.', // Cannot use asterisk with `-C` option, as it's evaluated by shell
       ],
     );

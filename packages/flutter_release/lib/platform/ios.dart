@@ -204,7 +204,7 @@ class IosPlatformBuild extends PlatformBuild {
   /// Build the artifact for iOS App Store. It creates a .ipa bundle.
   Future<String> _buildIosApp() async {
     // TODO: Signing without App Store not feasible at the moment
-    await flutterBuild.build(buildCmd: 'ios');
+    final filePath = await flutterBuild.build(buildCmd: 'ios');
 
     final artifactPath =
         flutterBuild.getArtifactPath(platform: 'ios', extension: 'zip');
@@ -215,7 +215,7 @@ class IosPlatformBuild extends PlatformBuild {
         '-k',
         '--sequesterRsrc',
         '--keepParent',
-        'build/ios/iphoneos/Runner.app',
+        filePath ?? 'build/ios/iphoneos/Runner.app',
         artifactPath,
       ],
     );
@@ -226,14 +226,14 @@ class IosPlatformBuild extends PlatformBuild {
   /// Build the artifact for iOS App Store. It creates a .ipa bundle.
   Future<String> _buildIosIpa() async {
     // Ipa build will fail resolving the provisioning profile, this is done later by fastlane.
-    await flutterBuild.build(buildCmd: 'ipa');
+    final filePath = await flutterBuild.build(buildCmd: 'ipa');
 
     // Does not create ipa at this point
     // final artifactPath =
     //     flutterBuild.getArtifactPath(platform: 'ios', extension: 'ipa');
     // final file = File('build/app/outputs/flutter-apk/app-release.apk');
     // await file.rename(artifactPath);
-    return '';
+    return filePath ?? '';
   }
 
   /// Build the artifact for iOS. Not supported as it requires signing.
@@ -602,4 +602,3 @@ team_id("$teamId")
     );
   }
 }
-

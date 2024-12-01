@@ -1,5 +1,6 @@
 import 'package:dart_release/utils.dart';
 import 'package:flutter_release/flutter_release.dart';
+import 'package:path/path.dart' as path;
 
 /// Build the app for Windows.
 class WindowsPlatformBuild extends PlatformBuild {
@@ -11,9 +12,16 @@ class WindowsPlatformBuild extends PlatformBuild {
   /// Build the artifact for Windows. It creates a .zip archive.
   @override
   Future<String> build() async {
-    await flutterBuild.build(buildCmd: 'windows');
+    var filePath = await flutterBuild.build(buildCmd: 'windows');
     final cpuArchitecture = getCpuArchitecture();
     final flutterArch = getFlutterCpuArchitecture(cpuArchitecture);
+
+    if (filePath != null) {
+      filePath = '${path.dirname(filePath)}\\*';
+    } else {
+      filePath = 'build\\windows\\$flutterArch\\runner\\Release\\*';
+    }
+
     final artifactPath = flutterBuild.getArtifactPath(
       platform: 'windows',
       arch: cpuArchitecture,
@@ -25,7 +33,7 @@ class WindowsPlatformBuild extends PlatformBuild {
         'Compress-Archive',
         '-Force',
         '-Path',
-        'build\\windows\\$flutterArch\\runner\\Release\\*',
+        filePath,
         '-DestinationPath',
         artifactPath.replaceAll('/', '\\'),
       ],

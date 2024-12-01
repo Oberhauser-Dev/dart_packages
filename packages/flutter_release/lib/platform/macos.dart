@@ -13,12 +13,14 @@ class MacOsPlatformBuild extends PlatformBuild {
   /// Build the artifact for macOS. It creates a .zip archive.
   @override
   Future<String> build() async {
-    await flutterBuild.build(buildCmd: 'macos');
-
-    // The App's build file/folder name (*.app) is not equal to [appName], so must read the actual file name.
-    // Must be read out after build!
-    final appNameFile = File('./macos/Flutter/ephemeral/.app_filename');
-    final dotAppName = (await appNameFile.readAsString()).trim();
+    var filePath = await flutterBuild.build(buildCmd: 'macos');
+    if (filePath == null) {
+      // The App's build file/folder name (*.app) is not equal to [appName], so must read the actual file name.
+      // Must be read out after build!
+      final appNameFile = File('./macos/Flutter/ephemeral/.app_filename');
+      final dotAppName = (await appNameFile.readAsString()).trim();
+      filePath = 'build/macos/Build/Products/Release/$dotAppName';
+    }
 
     final cpuArchitecture = getCpuArchitecture();
     final artifactPath = flutterBuild.getArtifactPath(
@@ -30,7 +32,7 @@ class MacOsPlatformBuild extends PlatformBuild {
         '-k',
         '--sequesterRsrc',
         '--keepParent',
-        'build/macos/Build/Products/Release/$dotAppName',
+        filePath,
         artifactPath,
       ],
     );

@@ -15,7 +15,9 @@ class WebPlatformBuild extends PlatformBuild {
   /// Build the artifact for Web. It creates a .tar.gz archive.
   @override
   Future<String> build() async {
-    await flutterBuild.build(buildCmd: 'web');
+    var filePath = await flutterBuild.build(buildCmd: 'web');
+    filePath ??= 'build/web';
+    final pathSegments = filePath.split('/');
 
     final artifactPath =
         flutterBuild.getArtifactPath(platform: 'web', extension: 'tar.gz');
@@ -25,8 +27,7 @@ class WebPlatformBuild extends PlatformBuild {
         '-czf',
         artifactPath,
         '-C',
-        'build',
-        'web',
+        ...pathSegments,
       ],
     );
 

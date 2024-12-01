@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_release/utils.dart';
@@ -54,7 +55,7 @@ class FlutterBuild {
   }
 
   /// Build the flutter binaries for the platform given in [buildCmd].
-  Future<void> build({required String buildCmd}) async {
+  Future<String?> build({required String buildCmd}) async {
     await Directory(releaseFolder).create(recursive: true);
     var buildName =
         '${buildVersion.major}.${buildVersion.minor}.${buildVersion.patch}';
@@ -66,7 +67,7 @@ class FlutterBuild {
     if (buildVersion.build.isNotEmpty) {
       buildNumber = buildVersion.build.map((p) => p.toString()).join('.');
     }
-    await runAsyncProcess(
+    final result = await runProcess(
       flutterSdkPath,
       [
         'build',
@@ -88,6 +89,20 @@ class FlutterBuild {
       // Must run in shell to correctly resolve paths on Windows
       runInShell: true,
     );
+    final filePath = _parseFlutterBuildResult(result.stdout);
+    print('Flutter output: $filePath');
+    return filePath;
+  }
+
+  String? _parseFlutterBuildResult(String output) {
+    const splitter = LineSplitter();
+    final lines = splitter.convert(output);
+    final resultSearchStr = 'Built';
+    final indexOfResult = lines.last.indexOf(resultSearchStr);
+    if (indexOfResult < 0) return null;
+    final startStr =
+        lines.last.substring(indexOfResult + resultSearchStr.length).trim();
+    return startStr.split(' ').first.trim();
   }
 
   /// Get the output path, where the artifact should be placed.

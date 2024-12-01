@@ -28,22 +28,24 @@ class AndroidPlatformBuild extends PlatformBuild {
 
   /// Build the artifact for Android. It creates a .apk installer.
   Future<String> _buildAndroidApk() async {
-    await flutterBuild.build(buildCmd: 'apk');
+    final filePath = await flutterBuild.build(buildCmd: 'apk');
 
     final artifactPath =
         flutterBuild.getArtifactPath(platform: 'android', extension: 'apk');
-    final file = File('build/app/outputs/flutter-apk/app-release.apk');
+    final file =
+        File(filePath ?? 'build/app/outputs/flutter-apk/app-release.apk');
     await file.rename(artifactPath);
     return artifactPath;
   }
 
   /// Build the artifact for Android. It creates a .aab installer.
   Future<String> _buildAndroidAab() async {
-    await flutterBuild.build(buildCmd: 'appbundle');
+    final filePath = await flutterBuild.build(buildCmd: 'appbundle');
 
     final artifactPath =
         flutterBuild.getArtifactPath(platform: 'android', extension: 'aab');
-    final file = File('build/app/outputs/bundle/release/app-release.aab');
+    final file =
+        File(filePath ?? 'build/app/outputs/bundle/release/app-release.aab');
     await file.rename(artifactPath);
     return artifactPath;
   }
