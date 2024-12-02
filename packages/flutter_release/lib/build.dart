@@ -82,6 +82,7 @@ class FlutterBuild {
           '-t',
           mainPath!,
         ],
+        // Try to avoid verbose mode "-v", otherwise the result string "✓ Built xxx" cannot be found.
       ],
       printCall: true,
       // Must run in shell to correctly resolve paths on Windows

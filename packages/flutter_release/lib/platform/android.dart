@@ -5,6 +5,7 @@ import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
 import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
+import 'package:flutter_release/tool_installation.dart';
 
 /// Build the app for Android.
 class AndroidPlatformBuild extends PlatformBuild {
@@ -118,27 +119,18 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
   @override
   Future<void> publish() async {
     print('Install dependencies...');
-    await runProcess(
-      'sudo',
-      [
-        'apt-get',
-        'install',
-        '-y',
-        'ruby',
-        'ruby-dev',
-      ],
-      runInShell: true,
-    );
-
-    await runProcess(
-      'sudo',
-      [
-        'gem',
-        'install',
+    if (!await isInstalled('fastlane')) {
+      await ensureInstalled('ruby');
+      await ensureInstalled('ruby-dev');
+      await ensureInstalled(
         'fastlane',
-      ],
-      runInShell: true,
-    );
+        installCommands: [
+          'sudo',
+          'gem',
+          'install',
+        ],
+      );
+    }
 
     final buildGradleFile = File('$_androidDirectory/app/build.gradle');
     final buildGradleFileContents = await buildGradleFile.readAsString();

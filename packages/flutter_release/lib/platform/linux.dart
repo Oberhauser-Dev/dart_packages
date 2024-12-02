@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dart_release/utils.dart';
 import 'package:flutter_release/flutter_release.dart';
+import 'package:flutter_release/tool_installation.dart';
 import 'package:flutter_to_debian/flutter_to_debian.dart';
 
 /// Build the app for Linux.
@@ -29,21 +30,12 @@ class LinuxPlatformBuild extends PlatformBuild {
     if (flutterBuild.installDeps) {
       await runProcess('sudo', ['apt-get', 'update'], runInShell: true);
 
-      await runProcess(
-        'sudo',
-        [
-          'apt-get',
-          'install',
-          '-y',
-          'clang',
-          'cmake',
-          'ninja-build',
-          'pkg-config',
-          'libgtk-3-dev',
-          'liblzma-dev'
-        ],
-        runInShell: true,
-      );
+      await ensureInstalled('clang');
+      await ensureInstalled('cmake');
+      await ensureInstalled('ninja-build');
+      await ensureInstalled('pkg-config');
+      await ensureInstalled('libgtk-3-dev');
+      await ensureInstalled('liblzma-dev');
     }
 
     await flutterBuild.build(buildCmd: 'linux');

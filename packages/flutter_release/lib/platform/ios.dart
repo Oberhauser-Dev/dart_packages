@@ -7,6 +7,7 @@ import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
 import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
+import 'package:flutter_release/tool_installation.dart';
 import 'package:pub_semver/pub_semver.dart';
 
 Future<String> generateApiKeyJson({
@@ -39,7 +40,7 @@ class IosSigningPrepare {
   IosSigningPrepare();
 
   Future<void> prepare() async {
-    await brewInstallFastlane();
+    await ensureInstalled('fastlane');
 
     if (!(await File('$_fastlaneDirectory/Appfile').exists())) {
       await runProcess(
@@ -303,7 +304,7 @@ class IosAppStoreDistributor extends PublishDistributor {
 
     final isProduction = flutterPublish.stage == PublishStage.production;
 
-    await brewInstallFastlane();
+    await ensureInstalled('fastlane');
 
     // Create tmp keychain to be able to run non interactively,
     // see https://github.com/fastlane/fastlane/blob/df12128496a9a0ad349f8cf8efe6f9288612f2cb/fastlane/lib/fastlane/actions/setup_ci.rb#L37
@@ -602,16 +603,3 @@ team_id("$teamId")
   }
 }
 
-Future<void> brewInstallFastlane() async {
-  try {
-    await runProcess(
-      'which',
-      ['fastlane'],
-    );
-  } catch (_) {
-    await runProcess(
-      'brew',
-      ['install', 'fastlane'],
-    );
-  }
-}
