@@ -28,7 +28,8 @@ flutter_release publish android-google-play \
  --fastlane-secrets-json-base64=$(base64 --wrap=0 android/fastlane-secrets.json) \
  --keystore-file-base64=$(base64 --wrap=0 android/keystore.jks) \
  --keystore-password=<mykeystorepassword> \
- --key-alias=<mykeyalias>
+ --key-alias=<mykeyalias> \
+ --key-password=<mykeypassword>
 ```
 
 If the command is not found (in the PATH), try: `dart pub global run flutter_release ...`.
@@ -98,7 +99,8 @@ Support for other app distributors is planned.
     --fastlane-secrets-json-base64=$(base64 --wrap=0 android/fastlane-secrets.json) \
     --keystore-file-base64=$(base64 --wrap=0 android/keystore.jks) \
     --keystore-password=<mykeystorepassword> \
-    --key-alias=<mykeyalias>
+    --key-alias=<mykeyalias> \
+    --key-password=<mykeypassword>
    ```
    For flavor support add:
    ```shell
