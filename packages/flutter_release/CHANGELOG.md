@@ -1,3 +1,9 @@
+## 0.2.9
+
+ - **FEAT**: Read build output from execution result.
+ - **FEAT**: Ensure installation of programs.
+ - **DOCS**: Add key password for android.
+
 ## 0.2.8
 
  - **FIX**: Always clean fastlane keychain.
