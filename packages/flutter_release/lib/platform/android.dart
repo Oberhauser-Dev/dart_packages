@@ -177,36 +177,21 @@ package_name("$packageName")
       _ => 'internal',
     };
 
-    Future<int?> getLastVersionCode() async {
-      final versionCodesStr = await runFastlaneProcess(
-        [
-          'run',
-          'google_play_track_version_codes',
-          // 'package_name: app_identifier',
-          'track:$track',
-        ],
-        workingDirectory: _androidDirectory,
-      );
-
-      // Get latest version code
-      if (versionCodesStr == null) return null;
-      final json = jsonDecode(versionCodesStr);
-      return json[0] as int?;
-    }
-
-    var versionCode = await getLastVersionCode();
-    // Increase versionCode by 1, if available:
-    versionCode = versionCode == null ? null : (versionCode + 1);
-    print(
-      'Use "$versionCode" as next version code unless build number is overridden.',
-    );
-
     print('Build application...');
-    if (versionCode != null) {
-      platformBuild.flutterBuild.buildVersion =
-          platformBuild.flutterBuild.buildVersion.copyWith(
-        build: versionCode.toString(),
-      );
+    if (platformBuild.flutterBuild.buildVersion.build.isEmpty) {
+      var versionCode = await _getLastVersionCodeFromGooglePlay(track);
+      if (versionCode != null) {
+        // Increase versionCode by 1, if available:
+        versionCode++;
+        print(
+          'Use "$versionCode" as next version code (fetched from Google Play).',
+        );
+
+        platformBuild.flutterBuild.buildVersion =
+            platformBuild.flutterBuild.buildVersion.copyWith(
+          build: versionCode.toString(),
+        );
+      }
     }
     final outputPath = await platformBuild.build();
     final outputFile = File(outputPath);
@@ -236,5 +221,22 @@ package_name("$packageName")
         runInShell: true,
       );
     }
+  }
+
+  Future<int?> _getLastVersionCodeFromGooglePlay(String track) async {
+    final versionCodesStr = await runFastlaneProcess(
+      [
+        'run',
+        'google_play_track_version_codes',
+        // 'package_name: app_identifier',
+        'track:$track',
+      ],
+      workingDirectory: _androidDirectory,
+    );
+
+    // Get latest version code
+    if (versionCodesStr == null) return null;
+    final json = jsonDecode(versionCodesStr);
+    return json[0] as int?;
   }
 }

@@ -8,7 +8,6 @@ import 'package:flutter_release/build.dart';
 import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
 import 'package:flutter_release/tool_installation.dart';
-import 'package:pub_semver/pub_semver.dart';
 
 Future<String> generateApiKeyJson({
   required String apiPrivateKeyBase64,
@@ -529,11 +528,11 @@ team_id("$teamId")
 
     if (!isProduction) {
       final buildVersion = platformBuild.flutterBuild.buildVersion;
-      // Remove semver suffix
+      // Remove semver preRelease suffix
       // See: https://github.com/flutter/flutter/issues/27589
-      if (buildVersion.isPreRelease || buildVersion.build.isNotEmpty) {
+      if (buildVersion.isPreRelease) {
         platformBuild.flutterBuild.buildVersion =
-            Version(buildVersion.major, buildVersion.minor, buildVersion.patch);
+            platformBuild.flutterBuild.buildVersion.copyWith(pre: null);
         print(
           'Build version was truncated from $buildVersion to '
           '${platformBuild.flutterBuild.buildVersion} as required by app store',
