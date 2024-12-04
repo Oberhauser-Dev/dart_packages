@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-12-04
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_release` - `v0.2.9+1`](#flutter_release---v0291)
+
+---
+
+#### `flutter_release` - `v0.2.9+1`
+
+ - **REFACTOR**: Print build artifact path.
+ - **FIX**: Allow space in built output.
+ - **FIX**: Allow overriding build version on Android/iOS.
+
+
 ## 2024-12-03
 
 ### Changes

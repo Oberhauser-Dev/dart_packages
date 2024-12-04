@@ -1,3 +1,9 @@
+## 0.2.9+1
+
+ - **REFACTOR**: Print build artifact path.
+ - **FIX**: Allow space in built output.
+ - **FIX**: Allow overriding build version on Android/iOS.
+
 ## 0.2.9
 
  - **FEAT**: Read build output from execution result.
