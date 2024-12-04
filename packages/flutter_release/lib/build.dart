@@ -89,20 +89,22 @@ class FlutterBuild {
       // Must run in shell to correctly resolve paths on Windows
       runInShell: true,
     );
-    final filePath = _parseFlutterBuildResult(result.stdout);
+    final filePath = parseFlutterBuildResult(result.stdout);
     print('Flutter output: $filePath');
     return filePath;
   }
 
-  String? _parseFlutterBuildResult(String output) {
+  static String? parseFlutterBuildResult(String output) {
     const splitter = LineSplitter();
     final lines = splitter.convert(output);
-    final resultSearchStr = 'Built';
-    final indexOfResult = lines.last.indexOf(resultSearchStr);
-    if (indexOfResult < 0) return null;
-    final startStr =
-        lines.last.substring(indexOfResult + resultSearchStr.length).trim();
-    return startStr.split(' ').first.trim();
+
+    final regExp = RegExp(r'Built\s+([^\n()]+)');
+    final match = regExp.firstMatch(lines.last);
+    if (match == null) {
+      return null;
+    }
+
+    return match.group(1)?.trim();
   }
 
   /// Get the output path, where the artifact should be placed.
