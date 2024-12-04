@@ -134,8 +134,14 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
       );
     }
 
-    final buildGradleFile = File('$_androidDirectory/app/build.gradle');
-    final buildGradleFileContents = await buildGradleFile.readAsString();
+    await ensureInstalled(
+      'bundler',
+      installCommands: [
+        'sudo',
+        'gem',
+        'install',
+      ],
+    );
 
     // Save Google play store credentials file
     final fastlaneSecretsJsonFile =
@@ -143,19 +149,44 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
     await fastlaneSecretsJsonFile
         .writeAsBytes(base64.decode(fastlaneSecretsJsonBase64));
 
-    final regex = RegExp(r'(?<=applicationId)(.*)(?=\n)');
-    final match = regex.firstMatch(buildGradleFileContents);
-    if (match == null) throw Exception('Application Id not found');
-    var packageName = match.group(0);
+    // Need to create a fastlane directory before working with plugins and the project.
+    await Directory(_fastlaneDirectory).create(recursive: true);
+
+    // Needed to support plugins
+    final gemFile = '''
+source "https://rubygems.org"
+gem "fastlane"
+plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
+eval_gemfile(plugins_path) if File.exist?(plugins_path)
+''';
+    await File('$_androidDirectory/Gemfile').writeAsString(gemFile);
+
+    // Install plugin to resolve the application id
+    // Must run in sudo mode because of https://github.com/rubygems/rubygems/issues/6272#issuecomment-1381683835
+    await runProcess(
+      'sudo',
+      ['fastlane', 'add_plugin', 'get_application_id_flavor'],
+      workingDirectory: _androidDirectory,
+      runInShell: true,
+      printCall: true,
+    );
+
+    final packageName = await runFastlaneProcess(
+      [
+        'run',
+        'get_application_id_flavor',
+        if (platformBuild.flutterBuild.flavor != null)
+          'flavor:${platformBuild.flutterBuild.flavor}',
+      ],
+      printCall: true,
+      workingDirectory: _androidDirectory,
+    );
     if (packageName == null) throw Exception('Application Id not found');
-    packageName = packageName.trim();
-    packageName = packageName.replaceAll('"', '');
-    packageName = packageName.replaceAll("'", '');
+
     final fastlaneAppfile = '''
 json_key_file("${fastlaneSecretsJsonFile.absolute.path}")
 package_name("$packageName")
     ''';
-    await Directory(_fastlaneDirectory).create(recursive: true);
     await File('$_fastlaneDirectory/Appfile').writeAsString(fastlaneAppfile);
 
     // Check if play store credentials are valid

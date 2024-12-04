@@ -88,6 +88,7 @@ abstract class CommonPublishCommand extends Command {
       buildPreRelease: results[argBuildPreRelease] as String?,
       buildArgs: results[argBuildArg] as List<String>,
       mainPath: results[argMainPath] as String?,
+      flavor: results[argFlavor] as String?,
       flutterSdkPath: results[argFlutterSdkPath] as String?,
     );
 

@@ -294,7 +294,8 @@ class IosAppStoreDistributor extends PublishDistributor {
     String? xcodeScheme,
   })  : isTeamEnterprise = isTeamEnterprise ?? false,
         updateProvisioning = updateProvisioning ?? false,
-        xcodeScheme = xcodeScheme ?? 'Runner',
+        xcodeScheme =
+            xcodeScheme ?? platformBuild.flutterBuild.flavor ?? 'Runner',
         super(distributorType: PublishDistributorType.iosAppStore);
 
   @override

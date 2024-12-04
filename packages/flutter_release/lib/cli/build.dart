@@ -8,6 +8,7 @@ import 'package:flutter_release/flutter_release.dart';
 
 // Common
 const argBuildVersion = 'build-version';
+const argFlavor = 'flavor';
 
 // Build Android
 const argKeyStoreFileBase64 = 'keystore-file-base64';
@@ -39,6 +40,7 @@ void addFlutterReleaseBuildArgs(ArgParser parser) {
   parser
     ..addOption(argAppName, abbr: 'n')
     ..addOption(argMainPath, abbr: 'm')
+    ..addOption(argFlavor)
     ..addOption(argAppVersion, abbr: 'v')
     ..addOption(argBuildVersion)
     ..addOption(argBuildMetadata, abbr: 'b')
@@ -72,6 +74,7 @@ abstract class CommonBuildCommand extends Command {
       buildPreRelease: results[argBuildPreRelease] as String?,
       buildArgs: results[argBuildArg] as List<String>,
       mainPath: results[argMainPath] as String?,
+      flavor: results[argFlavor] as String?,
       releaseFolder: results[argReleaseFolder] as String?,
       flutterSdkPath: results[argFlutterSdkPath] as String?,
     );

@@ -13,6 +13,7 @@ class FlutterBuild {
   late Version buildVersion;
   List<String> buildArgs;
   final String? mainPath;
+  final String? flavor;
   final String releaseFolder;
   final bool installDeps;
   final String flutterSdkPath;
@@ -24,6 +25,7 @@ class FlutterBuild {
     String? buildPreRelease,
     String? buildMetadata,
     this.mainPath,
+    this.flavor,
     this.buildArgs = const [],
     this.installDeps = true,
     String? releaseFolder,
@@ -83,6 +85,10 @@ class FlutterBuild {
           '-t',
           mainPath!,
         ],
+        if (flavor != null) ...[
+          '--flavor',
+          flavor!,
+        ]
         // Try to avoid verbose mode "-v", otherwise the result string "✓ Built xxx" cannot be found.
       ],
       printCall: true,

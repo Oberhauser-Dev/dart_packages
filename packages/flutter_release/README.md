@@ -104,7 +104,7 @@ Support for other app distributors is planned.
    ```
    For flavor support add:
    ```shell
-    --build-arg=--flavor=prod \
+    --flavor=prod \
     --main-path lib/main_prod.dart # Using "lib/main.dart" by default
    ```
 
@@ -140,9 +140,9 @@ Support for other app distributors is planned.
    Optionally add the `--team-enterprise` flag, if your team is in the Apple Developer Enterprise Program.
    For flavor support add:
    ```shell
-    --build-arg=--flavor=prod \
-    --xcode-scheme prod \ # Using "Runner" by default
-    --main-path lib/main_prod.dart # Using "lib/main.dart" by default
+    --flavor=prod \
+    --main-path lib/main_prod.dart \ # Using "lib/main.dart" by default
+    --xcode-scheme prod # Optional, uses flavor if set, or "Runner" by default
    ```
 
 To create additional provisioning profiles, run in the `ios` directory:
