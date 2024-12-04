@@ -194,6 +194,7 @@ package_name("$packageName")
       }
     }
     final outputPath = await platformBuild.build();
+    print('Build artifact path: $outputPath');
     final outputFile = File(outputPath);
 
     if (flutterPublish.isDryRun) {

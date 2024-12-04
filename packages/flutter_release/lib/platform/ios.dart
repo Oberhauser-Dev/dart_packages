@@ -541,7 +541,8 @@ team_id("$teamId")
     }
 
     // Build xcarchive only
-    await platformBuild.build();
+    final outputPath = await platformBuild.build();
+    print('Build artifact path: $outputPath');
 
     print('Build via flutter command finished. '
         'This usually fails using the provisioning profiles.\n'

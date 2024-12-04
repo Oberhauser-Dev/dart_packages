@@ -52,6 +52,7 @@ class WebServerDistributor extends PublishDistributor {
   Future<void> publish() async {
     print('Build application...');
     final outputPath = await platformBuild.build();
+    print('Build artifact path: $outputPath');
     final outputFile = File(outputPath);
 
     // Create tmp folder
