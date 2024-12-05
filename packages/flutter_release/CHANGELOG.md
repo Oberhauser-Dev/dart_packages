@@ -1,3 +1,10 @@
+## 0.3.0
+
+> Note: This release has breaking changes.
+
+ - **FIX**: Update package manager before installing.
+ - **BREAKING** **FEAT**: Explicit flavor support.
+
 ## 0.2.9+1
 
  - **REFACTOR**: Print build artifact path.

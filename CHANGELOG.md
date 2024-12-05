@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-12-05
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`flutter_release` - `v0.3.0`](#flutter_release---v030)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `flutter_release` - `v0.3.0`
+
+ - **FIX**: Update package manager before installing.
+ - **BREAKING** **FEAT**: Explicit flavor support.
+
+
 ## 2024-12-04
 
 ### Changes
