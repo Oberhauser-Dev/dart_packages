@@ -126,21 +126,13 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
       await ensureInstalled('ruby-dev');
       await ensureInstalled(
         'fastlane',
-        installCommands: [
-          'sudo',
-          'gem',
-          'install',
-        ],
+        installCommands: ['sudo', 'gem', 'install'],
       );
     }
 
     await ensureInstalled(
       'bundler',
-      installCommands: [
-        'sudo',
-        'gem',
-        'install',
-      ],
+      installCommands: ['sudo', 'gem', 'install'],
     );
 
     // Save Google play store credentials file

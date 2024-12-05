@@ -29,8 +29,6 @@ class LinuxPlatformBuild extends PlatformBuild {
   /// Build the artifact for Linux. It creates a .tar.gz archive.
   Future<String> _buildLinux({required String arch}) async {
     if (flutterBuild.installDeps) {
-      await runProcess('sudo', ['apt-get', 'update'], runInShell: true);
-
       await ensureInstalled('clang');
       await ensureInstalled('cmake');
       await ensureInstalled('ninja-build');

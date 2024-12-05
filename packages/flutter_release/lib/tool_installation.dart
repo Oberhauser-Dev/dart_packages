@@ -7,6 +7,7 @@ Future<void> ensureInstalled(
   List<String>? installCommands,
 }) async {
   if (!await isInstalled(processName)) {
+    await _updateDefaultPackageManager();
     installCommands ??= _defaultInstallCommands;
     installCommands.add(processName);
     final executable = installCommands.first;
@@ -41,4 +42,17 @@ List<String> get _defaultInstallCommands {
   }
   throw UnimplementedError(
       'Windows is not supported providing a default package manager yet.');
+}
+
+bool _isDefaultPackageManagerUpdated = false;
+
+Future<void> _updateDefaultPackageManager() async {
+  if (!_isDefaultPackageManagerUpdated) {
+    if (Platform.isLinux) {
+      await runProcess(
+        'sudo',
+        ['apt-get', 'update'],
+      );
+    }
+  }
 }
