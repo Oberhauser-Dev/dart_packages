@@ -141,27 +141,8 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
     await fastlaneSecretsJsonFile
         .writeAsBytes(base64.decode(fastlaneSecretsJsonBase64));
 
-    // Need to create a fastlane directory before working with plugins and the project.
-    await Directory(_fastlaneDirectory).create(recursive: true);
-
-    // Needed to support plugins
-    final gemFile = '''
-source "https://rubygems.org"
-gem "fastlane"
-plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
-eval_gemfile(plugins_path) if File.exist?(plugins_path)
-''';
-    await File('$_androidDirectory/Gemfile').writeAsString(gemFile);
-
-    // Install plugin to resolve the application id
-    // Must run in sudo mode because of https://github.com/rubygems/rubygems/issues/6272#issuecomment-1381683835
-    await runProcess(
-      'sudo',
-      ['fastlane', 'add_plugin', 'get_application_id_flavor'],
-      workingDirectory: _androidDirectory,
-      runInShell: true,
-      printCall: true,
-    );
+    await installFastlanePlugin('get_application_id_flavor',
+        workingDirectory: _androidDirectory);
 
     final packageName = await runFastlaneProcess(
       [

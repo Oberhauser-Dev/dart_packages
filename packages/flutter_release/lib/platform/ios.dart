@@ -273,6 +273,7 @@ class IosAppStoreDistributor extends PublishDistributor {
   final String distributionPrivateKeyBase64;
   final bool updateProvisioning;
   final String xcodeScheme;
+  final _isDevelopment = false;
 
   /// This may can be removed once getting certificates is implemented in fastlane
   /// https://developer.apple.com/documentation/appstoreconnectapi/list_and_download_certificates
@@ -345,16 +346,27 @@ class IosAppStoreDistributor extends PublishDistributor {
     }
 
     // Determine app bundle id
-    final iosAppInfoFile =
-        File('$_iosDirectory/Runner.xcodeproj/project.pbxproj');
-    final iosAppInfoFileContents = await iosAppInfoFile.readAsString();
-    final regex = RegExp(r'(?<=PRODUCT_BUNDLE_IDENTIFIER)(.*)(?=;\n)');
-    final match = regex.firstMatch(iosAppInfoFileContents);
-    if (match == null) throw Exception('Bundle Id not found');
-    var bundleId = match.group(0);
+    await installFastlanePlugin('get_product_bundle_id',
+        workingDirectory: _iosDirectory);
+
+    String buildConfiguration = _isDevelopment ? 'Debug' : 'Release';
+    if (xcodeScheme != 'Runner') {
+      buildConfiguration += '-$xcodeScheme';
+    }
+    final bundleId = await runFastlaneProcess(
+      [
+        'run',
+        'get_product_bundle_id',
+        'project_filepath:Runner.xcodeproj',
+        'target:Runner',
+        'scheme:$xcodeScheme',
+        'build_configuration:$buildConfiguration',
+      ],
+      printCall: true,
+      workingDirectory: _iosDirectory,
+    );
     if (bundleId == null) throw Exception('Bundle Id not found');
-    bundleId =
-        bundleId.replaceFirst('=', '').replaceAll('.RunnerTests', '').trim();
+
     print('Use app bundle id: $bundleId');
 
     final fastlaneAppfile = '''
@@ -486,6 +498,7 @@ team_id("$teamId")
             getBundleIdFromProductRubyFile!.path,
             'Runner.xcodeproj',
             provisionBundleId,
+            buildConfiguration,
           ],
           workingDirectory: _iosDirectory,
         );
@@ -512,7 +525,7 @@ team_id("$teamId")
     }
 
     // await installCertificates(isDevelopment: true);
-    await installCertificates(isDevelopment: false);
+    await installCertificates(isDevelopment: _isDevelopment);
 
     await runProcess(
       'fastlane',
