@@ -200,7 +200,6 @@ package_name("$packageName")
       _ => 'internal',
     };
 
-    print('Build application...');
     if (platformBuild.flutterBuild.buildVersion.build.isEmpty) {
       var versionCode = await _getLastVersionCodeFromGooglePlay(track);
       if (versionCode != null) {
@@ -216,6 +215,9 @@ package_name("$packageName")
         );
       }
     }
+
+    print('Build application...');
+
     final outputPath = await platformBuild.build();
     print('Build artifact path: $outputPath');
     final outputFile = File(outputPath);

@@ -525,8 +525,6 @@ team_id("$teamId")
       workingDirectory: _iosDirectory,
     );
 
-    print('Build application...');
-
     if (!isProduction) {
       final buildVersion = platformBuild.flutterBuild.buildVersion;
       // Remove semver preRelease suffix
@@ -540,6 +538,27 @@ team_id("$teamId")
         );
       }
     }
+
+    if (platformBuild.flutterBuild.buildVersion.build.isEmpty) {
+      var versionCode = await _getLastVersionCodeFromAppStoreConnect(
+        isProduction: isProduction,
+        apiKeyJsonPath: apiKeyJsonPath,
+      );
+      if (versionCode != null) {
+        // Increase versionCode by 1, if available:
+        versionCode++;
+        print(
+          'Use "$versionCode" as next version code (fetched from App Store Connect).',
+        );
+
+        platformBuild.flutterBuild.buildVersion =
+            platformBuild.flutterBuild.buildVersion.copyWith(
+          build: versionCode.toString(),
+        );
+      }
+    }
+
+    print('Build application...');
 
     // Build xcarchive only
     final outputPath = await platformBuild.build();
@@ -601,5 +620,24 @@ team_id("$teamId")
       ],
       workingDirectory: _iosDirectory,
     );
+  }
+
+  Future<int?> _getLastVersionCodeFromAppStoreConnect({
+    required bool isProduction,
+    required String apiKeyJsonPath,
+  }) async {
+    final versionCodesStr = await runFastlaneProcess(
+      [
+        'run',
+        'app_store_build_number',
+        'live:$isProduction',
+        'api_key_path:$apiKeyJsonPath',
+      ],
+      workingDirectory: _iosDirectory,
+    );
+
+    // Get latest version code
+    if (versionCodesStr == null) return null;
+    return int.tryParse(versionCodesStr);
   }
 }
