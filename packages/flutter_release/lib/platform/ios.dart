@@ -599,6 +599,7 @@ team_id("$teamId")
         'skip_build_archive:true',
         'archive_path:../build/ios/archive/Runner.xcarchive',
       ],
+      environment: {'FASTLANE_XCODEBUILD_SETTINGS_RETRIES': '15'},
       workingDirectory: _iosDirectory,
     );
 
