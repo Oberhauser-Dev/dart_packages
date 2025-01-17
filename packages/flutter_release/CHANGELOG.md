@@ -1,3 +1,7 @@
+## 0.3.1+1
+
+ - **FIX**: Increase retries for xcodebuild showBuildSettings.
+
 ## 0.3.1
 
  - **FIX**: Improved mechanism to detect bundle id on iOS (closes [#26](https://github.com/Oberhauser-dev/dart_packages/issues/26)).

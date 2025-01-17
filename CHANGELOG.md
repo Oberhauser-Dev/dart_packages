@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-17
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_release` - `v0.3.1+1`](#flutter_release---v0311)
+
+---
+
+#### `flutter_release` - `v0.3.1+1`
+
+ - **FIX**: Increase retries for xcodebuild showBuildSettings.
+
+
 ## 2024-12-17
 
 ### Changes
