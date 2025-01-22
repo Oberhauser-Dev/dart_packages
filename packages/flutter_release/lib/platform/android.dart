@@ -217,9 +217,10 @@ package_name("$packageName")
           track,
           '--release_status',
           switch (flutterPublish.stage) {
-            PublishStage.production => 'completed',
-            PublishStage.beta => 'completed',
-            PublishStage.alpha => 'completed',
+            PublishStage.production => 'draft',
+            PublishStage.beta => 'draft',
+            PublishStage.alpha => 'draft',
+            PublishStage.internal => 'completed',
             _ => 'draft',
           },
         ],
