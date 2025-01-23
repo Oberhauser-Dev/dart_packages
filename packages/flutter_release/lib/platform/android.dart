@@ -111,11 +111,13 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
   static final _fastlaneSecretsJsonFile = 'fastlane-secrets.json';
 
   final String fastlaneSecretsJsonBase64;
+  final ReleaseStatus releaseStatus;
 
   AndroidGooglePlayDistributor({
     required super.flutterPublish,
     required super.platformBuild,
     required this.fastlaneSecretsJsonBase64,
+    this.releaseStatus = ReleaseStatus.draft,
   }) : super(distributorType: PublishDistributorType.androidGooglePlay);
 
   @override
@@ -216,13 +218,7 @@ package_name("$packageName")
           '--track',
           track,
           '--release_status',
-          switch (flutterPublish.stage) {
-            PublishStage.production => 'draft',
-            PublishStage.beta => 'draft',
-            PublishStage.alpha => 'draft',
-            PublishStage.internal => 'completed',
-            _ => 'draft',
-          },
+          releaseStatus.name,
         ],
         workingDirectory: _androidDirectory,
         printCall: true,
@@ -247,4 +243,11 @@ package_name("$packageName")
     final json = jsonDecode(versionCodesStr);
     return json[0] as int?;
   }
+}
+
+enum ReleaseStatus {
+  completed,
+  draft,
+  halted,
+  inProgress,
 }
