@@ -1,3 +1,7 @@
+## 0.3.1+2
+
+ - **FIX**: Automatically use completed state on internal publish stage.
+
 ## 0.3.1+1
 
  - **FIX**: Increase retries for xcodebuild showBuildSettings.

@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-23
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_release` - `v0.3.1+2`](#flutter_release---v0312)
+
+---
+
+#### `flutter_release` - `v0.3.1+2`
+
+ - **FIX**: Automatically use completed state on internal publish stage.
+
+
 ## 2025-01-17
 
 ### Changes
