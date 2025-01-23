@@ -1,3 +1,7 @@
+## 0.3.2
+
+ - **FEAT**: Android Release status.
+
 ## 0.3.1+2
 
  - **FIX**: Automatically use completed state on internal publish stage.

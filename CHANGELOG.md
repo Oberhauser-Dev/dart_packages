@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`flutter_release` - `v0.3.2`](#flutter_release---v032)
+
+---
+
+#### `flutter_release` - `v0.3.2`
+
+ - **FEAT**: Android Release status.
+
+
+## 2025-01-23
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`flutter_release` - `v0.3.1+2`](#flutter_release---v0312)
 
 ---
