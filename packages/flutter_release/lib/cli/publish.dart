@@ -17,6 +17,7 @@ const argDryRun = 'dry-run';
 // Publish: Google Play
 const commandAndroidGooglePlay = 'android-google-play';
 const argFastlaneSecretsJsonBase64 = 'fastlane-secrets-json-base64';
+const argAndroidReleaseStatus = 'release-status';
 
 // Publish: iOS App Store
 const commandIosAppStore = 'ios-app-store';
@@ -117,6 +118,7 @@ class PublishAndroidGooglePlayCommand extends CommonPublishCommand {
   PublishAndroidGooglePlayCommand() {
     AndroidBuildCommand.addAndroidBuildArgs(argParser);
     argParser.addOption(argFastlaneSecretsJsonBase64, mandatory: true);
+    argParser.addOption(argAndroidReleaseStatus);
   }
 
   @override
@@ -133,12 +135,16 @@ class PublishAndroidGooglePlayCommand extends CommonPublishCommand {
       keyAlias: results[argKeyAlias] as String?,
       keyPassword: results[argKeyPassword] as String?,
     );
+    final releaseStatusStr = results[argAndroidReleaseStatus] as String?;
 
     return AndroidGooglePlayDistributor(
       flutterPublish: flutterPublish,
       platformBuild: platformBuild,
       fastlaneSecretsJsonBase64:
           results[argFastlaneSecretsJsonBase64] as String,
+      releaseStatus: releaseStatusStr == null
+          ? ReleaseStatus.draft
+          : ReleaseStatus.values.byName(releaseStatusStr),
     );
   }
 }
