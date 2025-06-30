@@ -2561,8 +2561,8 @@ class _TimePicker extends StatefulWidget {
 class _DurationPickerState extends State<_TimePicker> with RestorationMixin {
   Timer? _vibrateTimer;
   late DurationPickerMaterialLocalizations localizations;
-  final RestorableEnum<_DurationMode> _durationMode = RestorableEnum<_DurationMode>(
-    _DurationMode.hour,
+  late final RestorableEnum<_DurationMode> _durationMode = RestorableEnum<_DurationMode>(
+    widget.durationPickerMode.hasHours ? _DurationMode.hour : _DurationMode.minute,
     values: _DurationMode.values,
   );
   final RestorableEnumN<_DurationMode> _lastModeAnnounced = RestorableEnumN<_DurationMode>(
