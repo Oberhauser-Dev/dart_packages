@@ -1510,7 +1510,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_selectedDuration, 'selected_time');
+    registerForRestoration(_selectedDuration, 'selected_duration');
     registerForRestoration(hourHasError, 'hour_has_error');
     registerForRestoration(minuteHasError, 'minute_has_error');
     registerForRestoration(secondHasError, 'second_has_error');
@@ -2147,7 +2147,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> with Restor
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_selectedDuration, 'selected_time');
+    registerForRestoration(_selectedDuration, 'selected_duration');
     registerForRestoration(_entryMode, 'entry_mode');
     registerForRestoration(_autovalidateMode, 'autovalidate_mode');
     registerForRestoration(_orientation, 'orientation');
@@ -2620,12 +2620,12 @@ class _DurationPickerState extends State<_TimePicker> with RestorationMixin {
 
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_durationMode, 'hour_minute_mode');
+    registerForRestoration(_durationMode, 'duration_mode');
     registerForRestoration(_lastModeAnnounced, 'last_mode_announced');
     registerForRestoration(_autofocusHour, 'autofocus_hour');
     registerForRestoration(_autofocusMinute, 'autofocus_minute');
     registerForRestoration(_autofocusSecond, 'autofocus_second');
-    registerForRestoration(_selectedDuration, 'selected_time');
+    registerForRestoration(_selectedDuration, 'selected_duration');
     registerForRestoration(_orientation, 'orientation');
   }
 
