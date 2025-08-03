@@ -113,7 +113,7 @@ enum DurationFormat {
 }
 
 /// The [HourFormat] used for the given [DurationFormat].
-// TODO: valid to reuse of HourFormat from time.dart?
+// TODO(Gustl22): valid to reuse of HourFormat from time.dart?
 HourFormat hourDurationFormat({required DurationFormat of}) {
   switch (of) {
     case DurationFormat.H_colon_mm:

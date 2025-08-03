@@ -4,8 +4,8 @@ import 'package:material_duration_picker/material_duration_picker.dart';
 
 void main() {
   testWidgets('Duration Picker App', (WidgetTester tester) async {
-    const widget = MaterialApp(
-      localizationsDelegates: [
+    const MaterialApp widget = MaterialApp(
+      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
         DefaultDurationPickerMaterialLocalizations.delegate,
         DefaultMaterialLocalizations.delegate,
         DefaultWidgetsLocalizations.delegate,

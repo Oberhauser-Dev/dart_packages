@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'duration.dart';
 
-abstract class DurationPickerMaterialLocalizations
-    extends MaterialLocalizations {
+abstract class DurationPickerMaterialLocalizations extends MaterialLocalizations {
   /// The text-to-speech announcement made when a time picker invoked using
   /// [showTimePicker] is set to the second picker mode.
   String get timePickerSecondModeAnnouncement;
@@ -78,12 +77,10 @@ class _DurationPickerMaterialLocalizationsDelegate
   bool shouldReload(_DurationPickerMaterialLocalizationsDelegate old) => false;
 
   @override
-  String toString() =>
-      'DefaultDurationPickerMaterialLocalizations.delegate(en_US)';
+  String toString() => 'DefaultDurationPickerMaterialLocalizations.delegate(en_US)';
 }
 
-class DefaultDurationPickerMaterialLocalizations
-    extends DefaultMaterialLocalizations
+class DefaultDurationPickerMaterialLocalizations extends DefaultMaterialLocalizations
     implements DurationPickerMaterialLocalizations {
   /// Constructs an object that defines the material widgets' localized strings
   /// for US English (only).
@@ -96,8 +93,8 @@ class DefaultDurationPickerMaterialLocalizations
   /// to create an instance of this class.
   ///
   /// [MaterialApp] automatically adds this value to [MaterialApp.localizationsDelegates].
-  static const LocalizationsDelegate<DurationPickerMaterialLocalizations>
-      delegate = _DurationPickerMaterialLocalizationsDelegate();
+  static const LocalizationsDelegate<DurationPickerMaterialLocalizations> delegate =
+      _DurationPickerMaterialLocalizationsDelegate();
 
   @override
   String formatDurationHour(Duration duration) {
