@@ -1,11 +1,12 @@
 name: material_duration_picker
 description: "A duration picker using the material design of the time picker."
 version: 0.0.2+1
+resolution: workspace
 repository: https://github.com/Oberhauser-Dev/dart_packages/tree/main/packages/material_duration_picker
 
 environment:
-  sdk: ^3.4.0
-  flutter: ">=3.22.0"
+  sdk: ^3.6.0
+  flutter: ">=3.27.0"
 
 dependencies:
   flutter:

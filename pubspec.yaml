@@ -1,6 +1,25 @@
 name: dart_packages
+repository: https://github.com/Oberhauser-Dev/dart_packages
+workspace:
+  - packages/dart_release
+  - packages/flutter_release
+  - packages/material_duration_picker
+  - packages/material_duration_picker/example
+
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ^3.6.0
 
 dev_dependencies:
-  melos: ^6.0.0
+  melos: ^7.0.0-dev.9
+
+melos:
+  command:
+    bootstrap:
+      environment:
+        sdk: ^3.6.0
+        flutter: '>=3.27.0'
+
+  scripts:
+    test:
+      run: melos exec flutter test
+      description: Run all Flutter tests in this project.
