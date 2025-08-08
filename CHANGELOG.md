@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-08-08
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`material_duration_picker` - `v0.1.0`](#material_duration_picker---v010)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `material_duration_picker` - `v0.1.0`
+
+ - **REFACTOR**: Adapt restoration labels. ([6d0734e5](https://github.com/Oberhauser-Dev/dart_packages/commit/6d0734e52bca2dc55184f8b93371e43abac56d45))
+ - **FIX**: Highlight minutes by default when DurationPickerMode does not involve hours ([#37](https://github.com/Oberhauser-Dev/dart_packages/issues/37)). ([e2d80bd3](https://github.com/Oberhauser-Dev/dart_packages/commit/e2d80bd326ccb4beebe9177e3b98618de36f87cb))
+ - **FEAT**: Apply changes of Flutter (time_picker at flutter/flutter#a69ba5da). ([629abb22](https://github.com/Oberhauser-Dev/dart_packages/commit/629abb22f30ffb97c57105a2c371d176f5222601))
+ - **BREAKING** **FEAT**: Support all locales with english as fallback (closes [#28](https://github.com/Oberhauser-Dev/dart_packages/issues/28)). ([3e6300ca](https://github.com/Oberhauser-Dev/dart_packages/commit/3e6300ca055d5e71dba02efa95aa6ab29e3c395c))
+
+
 ## 2025-01-23
 
 ### Changes
