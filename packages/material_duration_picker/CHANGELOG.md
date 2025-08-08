@@ -1,3 +1,12 @@
+## 0.1.0
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: Adapt restoration labels. ([6d0734e5](https://github.com/Oberhauser-Dev/dart_packages/commit/6d0734e52bca2dc55184f8b93371e43abac56d45))
+ - **FIX**: Highlight minutes by default when DurationPickerMode does not involve hours ([#37](https://github.com/Oberhauser-Dev/dart_packages/issues/37)). ([e2d80bd3](https://github.com/Oberhauser-Dev/dart_packages/commit/e2d80bd326ccb4beebe9177e3b98618de36f87cb))
+ - **FEAT**: Apply changes of Flutter (time_picker at flutter/flutter#a69ba5da). ([629abb22](https://github.com/Oberhauser-Dev/dart_packages/commit/629abb22f30ffb97c57105a2c371d176f5222601))
+ - **BREAKING** **FEAT**: Support all locales with english as fallback (closes [#28](https://github.com/Oberhauser-Dev/dart_packages/issues/28)). ([3e6300ca](https://github.com/Oberhauser-Dev/dart_packages/commit/3e6300ca055d5e71dba02efa95aa6ab29e3c395c))
+
 ## 0.0.2+1
 
  - **FIX**: Parse versions starting with 'v' ([#13](https://github.com/Oberhauser-dev/dart_packages/issues/13)).
