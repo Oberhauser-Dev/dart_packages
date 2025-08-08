@@ -14,14 +14,15 @@ dart pub add material_duration_picker
 
 ## Usage
 
-Add the default localization delegate (the global delegate is not support yet):
+Add the global localization delegate (not all languages are supported yet, english is used as fallback):
 
 ```dart
 import 'package:material_duration_picker/material_duration_picker.dart';
 
 MaterialApp(
   localizationsDelegates: const [
-    DefaultDurationPickerMaterialLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalMaterialDurationPickerLocalizations.delegate,
   ],
   // ...
 ),

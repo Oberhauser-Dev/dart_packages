@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:material_duration_picker/material_duration_picker.dart';
 
 void main() => runApp(const DurationPickerApp());
@@ -13,12 +14,16 @@ class DurationPickerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       localizationsDelegates: const [
-        DefaultDurationPickerMaterialLocalizations.delegate,
+        GlobalMaterialDurationPickerLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
       ),
+      locale: const Locale('en'),
+      supportedLocales: const [Locale('en'), Locale('de'), Locale('it')],
       home: const Home(),
     );
   }

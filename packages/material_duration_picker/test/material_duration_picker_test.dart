@@ -6,7 +6,7 @@ void main() {
   testWidgets('Duration Picker App', (WidgetTester tester) async {
     const MaterialApp widget = MaterialApp(
       localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-        DefaultDurationPickerMaterialLocalizations.delegate,
+        DefaultMaterialDurationPickerLocalizations.delegate,
         DefaultMaterialLocalizations.delegate,
         DefaultWidgetsLocalizations.delegate,
       ],
