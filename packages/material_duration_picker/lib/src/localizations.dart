@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'duration.dart';
 
-abstract class DurationPickerMaterialLocalizations extends MaterialLocalizations {
+abstract class MaterialDurationPickerLocalizations {
   /// The text-to-speech announcement made when a time picker invoked using
   /// [showTimePicker] is set to the second picker mode.
   String get timePickerSecondModeAnnouncement;
@@ -56,45 +56,44 @@ abstract class DurationPickerMaterialLocalizations extends MaterialLocalizations
   /// ```dart
   /// tooltip: MaterialLocalizations.of(context).backButtonTooltip,
   /// ```
-  static DurationPickerMaterialLocalizations of(BuildContext context) {
-    return Localizations.of<DurationPickerMaterialLocalizations>(
-        context, DurationPickerMaterialLocalizations)!;
+  static MaterialDurationPickerLocalizations of(BuildContext context) {
+    return Localizations.of<MaterialDurationPickerLocalizations>(
+        context, MaterialDurationPickerLocalizations)!;
   }
 }
 
-class _DurationPickerMaterialLocalizationsDelegate
-    extends LocalizationsDelegate<DurationPickerMaterialLocalizations> {
-  const _DurationPickerMaterialLocalizationsDelegate();
+class _MaterialDurationPickerLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialDurationPickerLocalizations> {
+  const _MaterialDurationPickerLocalizationsDelegate();
 
   @override
   bool isSupported(Locale locale) => locale.languageCode == 'en';
 
   @override
-  Future<DurationPickerMaterialLocalizations> load(Locale locale) =>
-      DefaultDurationPickerMaterialLocalizations.load(locale);
+  Future<MaterialDurationPickerLocalizations> load(Locale locale) =>
+      DefaultMaterialDurationPickerLocalizations.load(locale);
 
   @override
-  bool shouldReload(_DurationPickerMaterialLocalizationsDelegate old) => false;
+  bool shouldReload(_MaterialDurationPickerLocalizationsDelegate old) => false;
 
   @override
-  String toString() => 'DefaultDurationPickerMaterialLocalizations.delegate(en_US)';
+  String toString() => 'DefaultMaterialDurationPickerLocalizations.delegate(en_US)';
 }
 
-class DefaultDurationPickerMaterialLocalizations extends DefaultMaterialLocalizations
-    implements DurationPickerMaterialLocalizations {
+class DefaultMaterialDurationPickerLocalizations implements MaterialDurationPickerLocalizations {
   /// Constructs an object that defines the material widgets' localized strings
   /// for US English (only).
   ///
   /// [LocalizationsDelegate] implementations typically call the static [load]
   /// function, rather than constructing this class directly.
-  const DefaultDurationPickerMaterialLocalizations();
+  const DefaultMaterialDurationPickerLocalizations();
 
   /// A [LocalizationsDelegate] that uses [DefaultMaterialLocalizations.load]
   /// to create an instance of this class.
   ///
   /// [MaterialApp] automatically adds this value to [MaterialApp.localizationsDelegates].
-  static const LocalizationsDelegate<DurationPickerMaterialLocalizations> delegate =
-      _DurationPickerMaterialLocalizationsDelegate();
+  static const LocalizationsDelegate<MaterialDurationPickerLocalizations> delegate =
+      _MaterialDurationPickerLocalizationsDelegate();
 
   @override
   String formatDurationHour(Duration duration) {
@@ -162,8 +161,8 @@ class DefaultDurationPickerMaterialLocalizations extends DefaultMaterialLocaliza
   ///
   /// This method is typically used to create a [LocalizationsDelegate].
   /// The [MaterialApp] does so by default.
-  static Future<DurationPickerMaterialLocalizations> load(Locale locale) {
-    return SynchronousFuture<DurationPickerMaterialLocalizations>(
-        const DefaultDurationPickerMaterialLocalizations());
+  static Future<MaterialDurationPickerLocalizations> load(Locale locale) {
+    return SynchronousFuture<MaterialDurationPickerLocalizations>(
+        const DefaultMaterialDurationPickerLocalizations());
   }
 }

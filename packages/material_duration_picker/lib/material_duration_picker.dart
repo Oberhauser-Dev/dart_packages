@@ -19,6 +19,7 @@ import 'src/duration.dart';
 import 'src/localizations.dart';
 
 export 'src/duration.dart';
+export 'src/global_localizations.dart';
 export 'src/localizations.dart';
 
 // Examples can assume:
@@ -266,7 +267,7 @@ class _DurationPickerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DurationFormat durationFormat =
-        DurationPickerMaterialLocalizations.of(context).durationFormat();
+        MaterialDurationPickerLocalizations.of(context).durationFormat();
 
     final RenderObjectWidget orientationSpecificHeader = switch (_DurationPickerModel.orientationOf(
       context,
@@ -339,7 +340,7 @@ class _DurationPickerHeader extends StatelessWidget {
         ),
     };
     return Semantics(
-      label: DurationPickerMaterialLocalizations.of(
+      label: MaterialDurationPickerLocalizations.of(
         context,
       ).formatDuration(_DurationPickerModel.selectedDurationOf(context)),
       child: orientationSpecificHeader,
@@ -417,8 +418,9 @@ class _HourControl extends StatelessWidget {
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
     final Duration selectedDuration = _DurationPickerModel.selectedDurationOf(context);
-    final DurationPickerMaterialLocalizations localizations =
-        DurationPickerMaterialLocalizations.of(context);
+    final MaterialLocalizations materialLocalizations = MaterialLocalizations.of(context);
+    final MaterialDurationPickerLocalizations localizations =
+        MaterialDurationPickerLocalizations.of(context);
     final String formattedHour = localizations.formatDurationHour(selectedDuration);
 
     Duration hoursFromSelected(int hoursToAdd) {
@@ -438,7 +440,7 @@ class _HourControl extends StatelessWidget {
     final String formattedPreviousHour = localizations.formatDurationHour(previousHour);
 
     return Semantics(
-      value: '${localizations.timePickerHourModeAnnouncement} $formattedHour',
+      value: '${materialLocalizations.timePickerHourModeAnnouncement} $formattedHour',
       excludeSemantics: true,
       increasedValue: formattedNextHour,
       onIncrease: () {
@@ -575,8 +577,9 @@ class _MinuteControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DurationPickerMaterialLocalizations localizations =
-        DurationPickerMaterialLocalizations.of(context);
+    final MaterialLocalizations materialLocalizations = MaterialLocalizations.of(context);
+    final MaterialDurationPickerLocalizations localizations =
+        MaterialDurationPickerLocalizations.of(context);
     final Duration selectedDuration = _DurationPickerModel.selectedDurationOf(context);
     final String formattedMinute = localizations.formatDurationMinute(selectedDuration);
     final Duration nextMinute = selectedDuration.replacing(
@@ -590,7 +593,7 @@ class _MinuteControl extends StatelessWidget {
 
     return Semantics(
       excludeSemantics: true,
-      value: '${localizations.timePickerMinuteModeAnnouncement} $formattedMinute',
+      value: '${materialLocalizations.timePickerMinuteModeAnnouncement} $formattedMinute',
       increasedValue: formattedNextMinute,
       onIncrease: () {
         _DurationPickerModel.setSelectedTime(context, nextMinute);
@@ -638,8 +641,8 @@ class _SecondControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DurationPickerMaterialLocalizations localizations =
-        DurationPickerMaterialLocalizations.of(context);
+    final MaterialDurationPickerLocalizations localizations =
+        MaterialDurationPickerLocalizations.of(context);
     final Duration selectedDuration = _DurationPickerModel.selectedDurationOf(context);
     final String formattedSecond = localizations.formatDurationSecond(selectedDuration);
     final Duration nextSecond = selectedDuration.replacing(
@@ -682,7 +685,7 @@ class _SecondControl extends StatelessWidget {
           ExcludeSemantics(
             child: Text(
               /*widget.secondLabelText ??*/
-              DurationPickerMaterialLocalizations.of(context).timePickerSecondLabel,
+              MaterialDurationPickerLocalizations.of(context).timePickerSecondLabel,
               style: Theme.of(context).textTheme.bodySmall,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -877,7 +880,8 @@ class _Dial extends StatefulWidget {
 
 class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   late ThemeData themeData;
-  late DurationPickerMaterialLocalizations localizations;
+  late MaterialDurationPickerLocalizations localizations;
+  late MaterialLocalizations materialLocalizations;
   _DialPainter? painter;
   late AnimationController _animationController;
   late Tween<double> _thetaTween;
@@ -909,7 +913,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     super.didChangeDependencies();
     assert(debugCheckHasMediaQuery(context));
     themeData = Theme.of(context);
-    localizations = DurationPickerMaterialLocalizations.of(context);
+    localizations = MaterialDurationPickerLocalizations.of(context);
+    materialLocalizations = MaterialLocalizations.of(context);
   }
 
   @override
@@ -1258,7 +1263,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
                 // The M3 specs for 24-hour ring show 0 hour as 00, but for 1-9,
                 // the specs show single digit.
                 duration.hour != 0
-                    ? localizations.formatDecimal(duration.hour)
+                    ? materialLocalizations.formatDecimal(duration.hour)
                     : localizations.formatDurationHour(duration),
             onTap: () {
               _selectHour(duration.hour);
@@ -1650,7 +1655,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
     final DurationFormat durationFormat =
-        DurationPickerMaterialLocalizations.of(context).durationFormat();
+        MaterialDurationPickerLocalizations.of(context).durationFormat();
     final ThemeData theme = Theme.of(context);
     final TimePickerThemeData timePickerTheme = _DurationPickerModel.themeOf(context);
     final _TimePickerDefaults defaultTheme = _DurationPickerModel.defaultThemeOf(context);
@@ -1700,8 +1705,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
                                 onSavedSubmitted: _handleHourSavedSubmitted,
                                 onChanged: _handleHourChanged,
                                 semanticHintText: widget.hourLabelText ??
-                                    DurationPickerMaterialLocalizations.of(context)
-                                        .timePickerHourLabel,
+                                    MaterialLocalizations.of(context).timePickerHourLabel,
                                 durationMode: _DurationMode.hour,
                               ),
                             ),
@@ -1711,8 +1715,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
                               ExcludeSemantics(
                                 child: Text(
                                   widget.hourLabelText ??
-                                      DurationPickerMaterialLocalizations.of(context)
-                                          .timePickerHourLabel,
+                                      MaterialLocalizations.of(context).timePickerHourLabel,
                                   style: theme.textTheme.bodySmall,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1741,8 +1744,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
                               validator: _validateMinute,
                               onSavedSubmitted: _handleMinuteSavedSubmitted,
                               semanticHintText: widget.minuteLabelText ??
-                                  DurationPickerMaterialLocalizations.of(context)
-                                      .timePickerMinuteLabel,
+                                  MaterialLocalizations.of(context).timePickerMinuteLabel,
                               durationMode: _DurationMode.minute,
                               onChanged: _handleMinuteChanged,
                             ),
@@ -1751,8 +1753,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
                             ExcludeSemantics(
                               child: Text(
                                 widget.minuteLabelText ??
-                                    DurationPickerMaterialLocalizations.of(context)
-                                        .timePickerMinuteLabel,
+                                    MaterialLocalizations.of(context).timePickerMinuteLabel,
                                 style: theme.textTheme.bodySmall,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -1778,7 +1779,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
                                 validator: _validateSecond,
                                 onSavedSubmitted: _handleSecondSavedSubmitted,
                                 semanticHintText: widget.secondLabelText ??
-                                    DurationPickerMaterialLocalizations.of(context)
+                                    MaterialDurationPickerLocalizations.of(context)
                                         .timePickerSecondLabel,
                                 durationMode: _DurationMode.second,
                               ),
@@ -1789,7 +1790,7 @@ class _TimePickerInputState extends State<_TimePickerInput> with RestorationMixi
                               ExcludeSemantics(
                                 child: Text(
                                   widget.secondLabelText ??
-                                      DurationPickerMaterialLocalizations.of(context)
+                                      MaterialDurationPickerLocalizations.of(context)
                                           .timePickerSecondLabel,
                                   style: theme.textTheme.bodySmall,
                                   maxLines: 1,
@@ -1898,8 +1899,8 @@ class _DurationTextFieldState extends State<_DurationTextField> with Restoration
   }
 
   String get _formattedValue {
-    final DurationPickerMaterialLocalizations localizations =
-        DurationPickerMaterialLocalizations.of(context);
+    final MaterialDurationPickerLocalizations localizations =
+        MaterialDurationPickerLocalizations.of(context);
     return switch (widget.durationMode) {
       _DurationMode.second => localizations.formatDurationSecond(widget.selectedDuration),
       _DurationMode.minute => localizations.formatDurationMinute(widget.selectedDuration),
@@ -2223,8 +2224,8 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> with Restor
         };
       case DurationPickerEntryMode.input:
       case DurationPickerEntryMode.inputOnly:
-        final DurationPickerMaterialLocalizations localizations =
-            DurationPickerMaterialLocalizations.of(context);
+        final MaterialDurationPickerLocalizations localizations =
+            MaterialDurationPickerLocalizations.of(context);
         final DurationFormat durationFormat = localizations.durationFormat();
         final double timePickerWidth;
         switch (durationFormat) {
@@ -2268,8 +2269,8 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> with Restor
         }
       case DurationPickerEntryMode.input:
       case DurationPickerEntryMode.inputOnly:
-        final DurationPickerMaterialLocalizations localizations =
-            DurationPickerMaterialLocalizations.of(context);
+        final MaterialDurationPickerLocalizations localizations =
+            MaterialDurationPickerLocalizations.of(context);
         final DurationFormat durationFormat = localizations.durationFormat();
         final double timePickerWidth;
         switch (durationFormat) {
@@ -2560,7 +2561,8 @@ class _TimePicker extends StatefulWidget {
 
 class _DurationPickerState extends State<_TimePicker> with RestorationMixin {
   Timer? _vibrateTimer;
-  late DurationPickerMaterialLocalizations localizations;
+  late MaterialLocalizations materialLocalizations;
+  late MaterialDurationPickerLocalizations localizations;
   late final RestorableEnum<_DurationMode> _durationMode = RestorableEnum<_DurationMode>(
     widget.durationPickerMode.hasHours ? _DurationMode.hour : _DurationMode.minute,
     values: _DurationMode.values,
@@ -2597,7 +2599,8 @@ class _DurationPickerState extends State<_TimePicker> with RestorationMixin {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    localizations = DurationPickerMaterialLocalizations.of(context);
+    materialLocalizations = MaterialLocalizations.of(context);
+    localizations = MaterialDurationPickerLocalizations.of(context);
   }
 
   @override
@@ -2745,8 +2748,8 @@ class _DurationPickerState extends State<_TimePicker> with RestorationMixin {
           padding: dialPadding,
           child: Semantics(
             label: switch (_durationMode.value) {
-              _DurationMode.hour => localizations.timePickerHourModeAnnouncement,
-              _DurationMode.minute => localizations.timePickerMinuteModeAnnouncement,
+              _DurationMode.hour => materialLocalizations.timePickerHourModeAnnouncement,
+              _DurationMode.minute => materialLocalizations.timePickerMinuteModeAnnouncement,
               _DurationMode.second => localizations.timePickerSecondModeAnnouncement,
             },
             liveRegion: true,
