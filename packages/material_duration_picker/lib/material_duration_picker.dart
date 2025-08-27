@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use
-
 /// A duration picker using the material design of the time picker.
 library material_duration_picker;
 
@@ -674,11 +672,13 @@ class _SecondControl extends StatelessWidget {
               isSelected: _DurationPickerModel.durationModeOf(context) == _DurationMode.second,
               text: formattedSecond,
               onTap: Feedback.wrapForTap(
-                  () => _DurationPickerModel.setDurationMode(context, _DurationMode.second),
-                  context)!,
-              onDoubleTap:
-                  _DurationPickerModel.of(context, _DurationPickerAspect.onSecondDoubleTapped)
-                      .onSecondDoubleTapped,
+                () => _DurationPickerModel.setDurationMode(context, _DurationMode.second),
+                context,
+              )!,
+              onDoubleTap: _DurationPickerModel.of(
+                context,
+                _DurationPickerAspect.onSecondDoubleTapped,
+              ).onSecondDoubleTapped,
             ),
           ),
           // TODO(Gustl22): is this practicable to state the unit here?
@@ -897,9 +897,11 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     _thetaTween = Tween<double>(begin: _getThetaForTime(widget.selectedDuration));
     _radiusTween = Tween<double>(begin: _getRadiusForTime(widget.selectedDuration));
     _theta = _animationController.drive(CurveTween(curve: standardEasing)).drive(_thetaTween)
-      ..addListener(() => setState(() {
-            /* _theta.value has changed */
-          }));
+      ..addListener(
+        () => setState(() {
+          /* _theta.value has changed */
+        }),
+      );
     _radius = _animationController.drive(CurveTween(curve: standardEasing)).drive(_radiusTween)
       ..addListener(
         () => setState(() {
