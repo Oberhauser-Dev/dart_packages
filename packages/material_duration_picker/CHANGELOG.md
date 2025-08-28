@@ -1,3 +1,8 @@
+## 0.1.1
+
+ - **REFACTOR**: Reformat material_duration_picker. ([ef103c5b](https://github.com/Oberhauser-Dev/dart_packages/commit/ef103c5bba3d77d1ae762b55595abcba663cc468))
+ - **FEAT**: Apply changes of Flutter (time_picker at flutter/flutter[#41](https://github.com/Oberhauser-Dev/dart_packages/issues/41)c21bb). ([8187119e](https://github.com/Oberhauser-Dev/dart_packages/commit/8187119e8a5fb70b05f8ab3df18ce9c4560b80dd))
+
 ## 0.1.0
 
 > Note: This release has breaking changes.

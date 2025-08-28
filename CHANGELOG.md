@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-08-28
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`material_duration_picker` - `v0.1.1`](#material_duration_picker---v011)
+
+---
+
+#### `material_duration_picker` - `v0.1.1`
+
+ - **REFACTOR**: Reformat material_duration_picker. ([ef103c5b](https://github.com/Oberhauser-Dev/dart_packages/commit/ef103c5bba3d77d1ae762b55595abcba663cc468))
+ - **FEAT**: Apply changes of Flutter (time_picker at flutter/flutter[#41](https://github.com/Oberhauser-Dev/dart_packages/issues/41)c21bb). ([8187119e](https://github.com/Oberhauser-Dev/dart_packages/commit/8187119e8a5fb70b05f8ab3df18ce9c4560b80dd))
+
+
 ## 2025-08-08
 
 ### Changes
