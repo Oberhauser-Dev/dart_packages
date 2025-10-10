@@ -27,7 +27,7 @@ class LinuxPlatformBuild extends PlatformBuild {
   }
 
   /// Build the artifact for Linux. It creates a .tar.gz archive.
-  Future<String> _buildLinux({required String arch}) async {
+  Future<String> _buildLinux({required CpuArchitecture arch}) async {
     if (flutterBuild.installDeps) {
       await ensureInstalled('clang');
       await ensureInstalled('cmake');
@@ -63,7 +63,7 @@ class LinuxPlatformBuild extends PlatformBuild {
   }
 
   /// Build the artifact for Debian. It creates a .deb installer.
-  Future<String> _buildDebian({required String arch}) async {
+  Future<String> _buildDebian({required CpuArchitecture arch}) async {
     await _buildLinux(arch: arch);
 
     final flutterArch = getFlutterCpuArchitecture(arch);

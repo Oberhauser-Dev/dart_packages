@@ -15,7 +15,7 @@ class DartBuild {
   final String releaseFolder;
   late final String buildFolder;
   late final String executableName;
-  late final String _arch;
+  late final CpuArchitecture _arch;
   final List<String> includedPaths;
   final String dartSdkPath;
 
@@ -132,7 +132,7 @@ class DartBuild {
   /// Get the output path, where the artifact should be placed.
   String getArtifactPath({required String extension}) {
     final packageName =
-        '$appName-$appVersion-${Platform.operatingSystem}-$_arch';
+        '$appName-$appVersion-${Platform.operatingSystem}-${_arch.name}';
     return '$releaseFolder/$packageName.$extension';
   }
 }

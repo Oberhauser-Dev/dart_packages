@@ -117,9 +117,9 @@ class FlutterBuild {
   String getArtifactPath({
     required String platform,
     required String extension,
-    String? arch,
+    CpuArchitecture? arch,
   }) {
-    return '$releaseFolder/$appName-$appVersion-$platform${arch != null ? '-$arch' : ''}.$extension';
+    return '$releaseFolder/$appName-$appVersion-$platform${arch != null ? '-${arch.name}' : ''}.$extension';
   }
 }
 
