@@ -1,3 +1,7 @@
+## 0.3.3
+
+ - **FEAT**: Support more Cpu architectures. ([b50543c5](https://github.com/Oberhauser-Dev/dart_packages/commit/b50543c5677cd64fba3def6fc342ee4096653c29))
+
 ## 0.3.2
 
  - **FEAT**: Android Release status.

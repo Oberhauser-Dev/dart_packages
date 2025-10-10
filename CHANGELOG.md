@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-10-10
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.11`](#dart_release---v0211)
+ - [`flutter_release` - `v0.3.3`](#flutter_release---v033)
+
+---
+
+#### `dart_release` - `v0.2.11`
+
+ - **FEAT**: Support more Cpu architectures. ([b50543c5](https://github.com/Oberhauser-Dev/dart_packages/commit/b50543c5677cd64fba3def6fc342ee4096653c29))
+
+#### `flutter_release` - `v0.3.3`
+
+ - **FEAT**: Support more Cpu architectures. ([b50543c5](https://github.com/Oberhauser-Dev/dart_packages/commit/b50543c5677cd64fba3def6fc342ee4096653c29))
+
+
 ## 2025-08-28
 
 ### Changes
