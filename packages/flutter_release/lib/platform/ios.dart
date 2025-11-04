@@ -9,6 +9,8 @@ import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
 import 'package:flutter_release/tool_installation.dart';
 
+const apiKeyJsonFileName = 'ApiAuth.json';
+
 Future<String> generateApiKeyJson({
   required String apiPrivateKeyBase64,
   required String apiKeyId,
@@ -26,7 +28,7 @@ Future<String> generateApiKeyJson({
   "is_key_content_base64": true
 }
   ''';
-  final apiKeyJsonFile = File('$workingDirectory/ApiAuth.json');
+  final apiKeyJsonFile = File('$workingDirectory/$apiKeyJsonFileName');
   await apiKeyJsonFile.writeAsString(apiKeyJsonContent);
 
   return apiKeyJsonFile.absolute.path;
@@ -89,62 +91,13 @@ class IosSigningPrepare {
     final apiPrivateKeyBase64 =
         base64Encode(await File.fromUri(apiPrivateKeyFile.uri).readAsBytes());
 
-    final apiKeyJsonPath = await generateApiKeyJson(
+    final absoluteApiKeyJsonPath = await generateApiKeyJson(
       apiPrivateKeyBase64: apiPrivateKeyBase64,
       apiKeyId: apiKeyId,
       apiIssuerId: apiIssuerId,
       isTeamEnterprise: isTeamEnterprise,
       workingDirectory: _iosDirectory,
     );
-
-    Future<void> handleCertificate({required bool isDevelopment}) async {
-      FileSystemEntity? privateKeyFile = entities.firstWhereOrNull(
-          (file) => file.uri.pathSegments.last.endsWith('.p12'));
-      FileSystemEntity? certFile = entities.firstWhereOrNull(
-          (file) => file.uri.pathSegments.last.endsWith('.cer'));
-      if (privateKeyFile == null || certFile == null) {
-        // Download and install a new certificate
-        await runProcess(
-          'fastlane',
-          [
-            'cert', // get_certificates
-            'development:${isDevelopment ? 'true' : 'false'}',
-            'force:true',
-            '--api_key_path',
-            apiKeyJsonPath,
-          ],
-          workingDirectory: _iosDirectory,
-        );
-
-        final entities = await iosDir.list().toList();
-        privateKeyFile = entities
-            .firstWhere((file) => file.uri.pathSegments.last.endsWith('.p12'));
-        certFile = entities
-            .firstWhere((file) => file.uri.pathSegments.last.endsWith('.cer'));
-      }
-
-      final certType = isDevelopment ? 'Development' : 'Distribution';
-
-      final p12PrivateKeyBase64 =
-          base64Encode(await File.fromUri(privateKeyFile.uri).readAsBytes());
-      print(
-          'Base64 Private Key for $certType (${certType.toLowerCase()}-private-key-base64, exported as IOS_${certType.toUpperCase()}_PRIVATE_KEY):\n');
-      print('$p12PrivateKeyBase64\n');
-
-      final certBase64 =
-          base64Encode(await File.fromUri(certFile.uri).readAsBytes());
-      print(
-          'Base64 Certificate for $certType (${certType.toLowerCase()}-cert-base64, exported as IOS_${certType.toUpperCase()}_CERT):\n');
-      print('$certBase64\n');
-
-      await runProcess(
-        'export',
-        [
-          'IOS_${certType.toUpperCase()}_PRIVATE_KEY=$p12PrivateKeyBase64',
-          'IOS_${certType.toUpperCase()}_CERT=$certBase64',
-        ],
-      );
-    }
 
     print(
         'Enter your content provider id (team_id, exported as IOS_TEAM_ID), see https://developer.apple.com/account#MembershipDetailsCard:');
@@ -158,21 +111,24 @@ class IosSigningPrepare {
         'Base64 Private Key for App Store connect API (api-private-key-base64, exported as IOS_API_PRIVATE_KEY):\n');
     print('$apiPrivateKeyBase64\n');
 
-    await handleCertificate(isDevelopment: false);
+    final (p12PrivateKeyBase64, certBase64) = await createCertificate(
+        isDevelopment: false, apiKeyJsonPath: absoluteApiKeyJsonPath);
 
-    await runProcess(
-      'export',
-      [
-        'IOS_APPLE_USERNAME=$appleUsername',
-        'IOS_API_KEY_ID=$apiKeyId',
-        'IOS_API_ISSUER_ID=$apiIssuerId',
-        'IOS_API_PRIVATE_KEY=$apiPrivateKeyBase64',
-        'IOS_CONTENT_PROVIDER_ID=$contentProviderId',
-        'IOS_TEAM_ID=$teamId',
-      ],
-    );
+    print('Example command to publish the iOS app via flutter_release:\n');
 
-    var exampleCommand = r'''
+    var exampleCommand = '''
+export \\
+    IOS_DISTRIBUTION_PRIVATE_KEY=$p12PrivateKeyBase64 \\
+    IOS_DISTRIBUTION_CERT=$certBase64 \\
+    IOS_APPLE_USERNAME=$appleUsername \\
+    IOS_API_KEY_ID=$apiKeyId \\
+    IOS_API_ISSUER_ID=$apiIssuerId \\
+    IOS_API_PRIVATE_KEY=$apiPrivateKeyBase64 \\
+    IOS_CONTENT_PROVIDER_ID=$contentProviderId \\
+    IOS_TEAM_ID=$teamId\n\n
+    ''';
+
+    exampleCommand += r'''
 flutter_release publish ios-app-store \
   --dry-run \
   --app-name my_app \ # Optional
@@ -190,6 +146,70 @@ flutter_release publish ios-app-store \
       exampleCommand += ' --team-enterprise';
     }
     print(exampleCommand);
+  }
+
+  FileSystemEntity? _getLatestFileByExtension(
+      List<FileSystemEntity> entities, String extension) {
+    return entities
+        .where((file) => file.uri.pathSegments.last.endsWith(extension))
+        .toList()
+        .sorted(
+            (a, b) => b.statSync().modified.compareTo(a.statSync().modified))
+        .firstOrNull;
+  }
+
+  Future<(String, String)> createCertificate({
+    required bool isDevelopment,
+    String? apiKeyJsonPath,
+    bool force = false,
+  }) async {
+    final iosDir = Directory(_iosDirectory);
+    final entities = await iosDir.list().toList();
+
+    final apiKeyJsonFile =
+        File(apiKeyJsonPath ?? '$_iosDirectory/$apiKeyJsonFileName');
+    if (!await apiKeyJsonFile.exists()) {
+      throw Exception('API Key JSON file not found at ${apiKeyJsonFile.path}.\n'
+          'Please provide one e.g. by calling `prepare` or `publish`.');
+    }
+
+    FileSystemEntity? privateKeyFile =
+        _getLatestFileByExtension(entities, '.p12');
+    FileSystemEntity? certFile = _getLatestFileByExtension(entities, '.cer');
+    if (force || privateKeyFile == null || certFile == null) {
+      // Download and install a new certificate
+      await runFastlaneProcess(
+        [
+          'cert', // get_certificates
+          if (isDevelopment) '--development',
+          '--force',
+          '--api_key_path',
+          apiKeyJsonFile.absolute.path,
+        ],
+        workingDirectory: _iosDirectory,
+        printCall: true,
+      );
+
+      final entities = await iosDir.list().toList();
+      privateKeyFile = _getLatestFileByExtension(entities, '.p12')!;
+      certFile = _getLatestFileByExtension(entities, '.cer')!;
+    }
+
+    final certType = isDevelopment ? 'Development' : 'Distribution';
+
+    final p12PrivateKeyBase64 =
+        base64Encode(await File.fromUri(privateKeyFile.uri).readAsBytes());
+    print(
+        'Base64 Private Key for $certType (${certType.toLowerCase()}-private-key-base64, exported as IOS_${certType.toUpperCase()}_PRIVATE_KEY):\n');
+    print('$p12PrivateKeyBase64\n');
+
+    final certBase64 =
+        base64Encode(await File.fromUri(certFile.uri).readAsBytes());
+    print(
+        'Base64 Certificate for $certType (${certType.toLowerCase()}-cert-base64, exported as IOS_${certType.toUpperCase()}_CERT):\n');
+    print('$certBase64\n');
+
+    return (p12PrivateKeyBase64, certBase64);
   }
 }
 

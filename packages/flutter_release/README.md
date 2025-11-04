@@ -145,6 +145,11 @@ Support for other app distributors is planned.
     --xcode-scheme prod # Optional, uses flavor if set, or "Runner" by default
    ```
 
+To force renew the certificates run:
+```shell
+flutter_release prepare ios cert
+```
+
 To create additional provisioning profiles, run in the `ios` directory:
 ```
 fastlane sigh -a com.example.ios.to.be.added --api_key_path ApiAuth.json

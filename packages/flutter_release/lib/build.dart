@@ -88,7 +88,7 @@ class FlutterBuild {
         if (flavor != null) ...[
           '--flavor',
           flavor!,
-        ]
+        ],
         // Try to avoid verbose mode "-v", otherwise the result string "✓ Built xxx" cannot be found.
       ],
       printCall: true,
