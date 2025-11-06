@@ -631,7 +631,13 @@ team_id("$teamId")
         await runProcess(
           'fastlane',
           // upload_to_testflight
-          ['pilot', 'upload', '--api_key_path', apiKeyJsonPath],
+          [
+            'pilot',
+            'upload',
+            '--skip_waiting_for_build_processing',
+            '--api_key_path',
+            apiKeyJsonPath
+          ],
           workingDirectory: _iosDirectory,
           printCall: true,
         );
