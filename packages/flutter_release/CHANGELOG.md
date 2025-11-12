@@ -1,3 +1,10 @@
+## 0.3.4
+
+ - **PERF**: Add skip_waiting_for_build_processing to iOS upload (closes [#48](https://github.com/Oberhauser-Dev/dart_packages/issues/48)). ([c36f970e](https://github.com/Oberhauser-Dev/dart_packages/commit/c36f970e4b10f454ac9a85aa240ae2ced97f65c4))
+ - **FEAT**: Support Kotlin gradle files. ([cfa76c96](https://github.com/Oberhauser-Dev/dart_packages/commit/cfa76c96762f68d4391a54e8ada888ff1b307ed7))
+ - **FEAT**: Renew ios certificate ([#46](https://github.com/Oberhauser-Dev/dart_packages/issues/46)). ([c576e394](https://github.com/Oberhauser-Dev/dart_packages/commit/c576e39480ccc18d414fda8bd33b6e413eb629d3))
+ - **DOCS**: Add option `release-status` to README. ([a32c7458](https://github.com/Oberhauser-Dev/dart_packages/commit/a32c7458e13e7b777359377cb3e3f2bfd991ecd5))
+
 ## 0.3.3
 
  - **FEAT**: Support more Cpu architectures. ([b50543c5](https://github.com/Oberhauser-Dev/dart_packages/commit/b50543c5677cd64fba3def6fc342ee4096653c29))
