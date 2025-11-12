@@ -102,11 +102,16 @@ Support for other app distributors is planned.
     --key-alias=<mykeyalias> \
     --key-password=<mykeypassword>
    ```
-   For flavor support add:
+   For flavor support, add:
    ```shell
     --flavor=prod \
     --main-path lib/main_prod.dart # Using "lib/main.dart" by default
    ```
+   To set the release status (default `draft`), add:
+   ```shell
+    --release-status=completed
+   ```
+   You need to have released an alpha version for `completed` status to work: https://github.com/fastlane/fastlane/discussions/18293
 
 ### iOS - App Store
 
