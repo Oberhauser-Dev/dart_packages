@@ -57,7 +57,10 @@ class AndroidPlatformBuild extends PlatformBuild {
         keyAlias != null &&
         keyPassword != null) {
       // Check if key signing is prepared
-      final buildGradleFile = File('$_androidDirectory/app/build.gradle');
+      var buildGradleFile = File('$_androidDirectory/app/build.gradle.kts');
+      if (!(await buildGradleFile.exists())) {
+        buildGradleFile = File('$_androidDirectory/app/build.gradle');
+      }
       final buildGradleFileContents = await buildGradleFile.readAsString();
       if (!(buildGradleFileContents.contains('key.properties') &&
           buildGradleFileContents.contains('keyAlias') &&
