@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_release/utils.dart';
+import 'package:logging/logging.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
+
+final _logger = Logger('FlutterBuild');
 
 /// Class which holds the necessary attributes to perform a build on various
 /// platforms for the specified [buildType].
@@ -58,7 +61,9 @@ class FlutterBuild {
 
   /// Build the flutter binaries for the platform given in [buildCmd].
   Future<String?> build({required String buildCmd}) async {
+    _logger.fine('Prepare artifact folder: $releaseFolder');
     await Directory(releaseFolder).create(recursive: true);
+
     var buildName =
         '${buildVersion.major}.${buildVersion.minor}.${buildVersion.patch}';
     if (buildVersion.preRelease.isNotEmpty) {
@@ -95,7 +100,7 @@ class FlutterBuild {
       runInShell: true,
     );
     final filePath = parseFlutterBuildResult(result.stdout);
-    print('Flutter output: $filePath');
+    _logger.info('Flutter output: $filePath');
     return filePath;
   }
 

@@ -8,8 +8,11 @@ import 'package:flutter_release/build.dart';
 import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
 import 'package:flutter_release/tool_installation.dart';
+import 'package:logging/logging.dart';
 
 const apiKeyJsonFileName = 'ApiAuth.json';
+
+final _logger = Logger('iOS');
 
 Future<String> generateApiKeyJson({
   required String apiPrivateKeyBase64,
@@ -51,7 +54,7 @@ class IosSigningPrepare {
         ],
         workingDirectory: _iosDirectory,
       );
-      print('Created fastlane config in `ios` directory.');
+      _logger.info('Created fastlane config in `ios` directory.');
     }
 
     final iosDir = Directory(_iosDirectory);
@@ -262,7 +265,7 @@ class IosPlatformBuild extends PlatformBuild {
         flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
     if (int.tryParse(buildMetadata) == null) {
       if (buildMetadata.isNotEmpty) {
-        print(
+        _logger.warning(
             'Non integer values for build metadata are not supported on iOS. Omitting "$buildMetadata".');
       }
       flutterBuild.buildVersion =
@@ -321,7 +324,7 @@ class IosAppStoreDistributor extends PublishDistributor {
 
   @override
   Future<void> publish() async {
-    print('Install dependencies...');
+    _logger.info('Install dependencies...');
 
     final isProduction = flutterPublish.stage == PublishStage.production;
 
@@ -348,7 +351,8 @@ class IosAppStoreDistributor extends PublishDistributor {
         workingDirectory: _iosDirectory,
       );
     } else {
-      print('Not on CI: Create keychain "$fastlaneKeychainName" manually.');
+      _logger.warning(
+          'Not on CI: Create keychain "$fastlaneKeychainName" manually.');
       await runProcess(
         'fastlane',
         [
@@ -387,7 +391,7 @@ class IosAppStoreDistributor extends PublishDistributor {
     );
     if (bundleId == null) throw Exception('Bundle Id not found');
 
-    print('Use app bundle id: $bundleId');
+    _logger.info('Use app bundle id: $bundleId');
 
     final fastlaneAppfile = '''
 app_identifier("$bundleId")
@@ -523,7 +527,7 @@ team_id("$teamId")
           workingDirectory: _iosDirectory,
         );
         final target = result.stdout.trim();
-        print('Target "$target" has bundle id "$provisionBundleId"');
+        _logger.info('Target "$target" has bundle id "$provisionBundleId"');
 
         result = await runProcess(
           'fastlane',
@@ -539,8 +543,9 @@ team_id("$teamId")
           ],
           workingDirectory: _iosDirectory,
         );
-        print('Updating provisioning profile $filePath ($provisionBundleId)');
-        print(result.stdout);
+        _logger.info(
+            'Updating provisioning profile $filePath ($provisionBundleId)');
+        _logger.info(result.stdout);
       }
     }
 
@@ -565,7 +570,7 @@ team_id("$teamId")
       if (buildVersion.isPreRelease) {
         platformBuild.flutterBuild.buildVersion =
             platformBuild.flutterBuild.buildVersion.copyWith(pre: null);
-        print(
+        _logger.info(
           'Build version was truncated from $buildVersion to '
           '${platformBuild.flutterBuild.buildVersion} as required by app store',
         );
@@ -580,7 +585,7 @@ team_id("$teamId")
       if (versionCode != null) {
         // Increase versionCode by 1, if available:
         versionCode++;
-        print(
+        _logger.info(
           'Use "$versionCode" as next version code (fetched from App Store Connect).',
         );
 
@@ -591,13 +596,13 @@ team_id("$teamId")
       }
     }
 
-    print('Build application...');
+    _logger.info('Build application...');
 
     // Build xcarchive only
     final outputPath = await platformBuild.build();
-    print('Build artifact path: $outputPath');
+    _logger.info('Build artifact path: $outputPath');
 
-    print('Build via flutter command finished. '
+    _logger.info('Build via flutter command finished. '
         'This usually fails using the provisioning profiles.\n'
         'Therefore the app is now build again with fastlane. '
         'See: https://docs.flutter.dev/deployment/cd, '
@@ -607,7 +612,7 @@ team_id("$teamId")
     // https://docs.flutter.dev/deployment/cd
     // https://github.com/flutter/flutter/issues/106612
 
-    print('Using XCode scheme "$xcodeScheme" to build the project.');
+    _logger.info('Using XCode scheme "$xcodeScheme" to build the project.');
 
     await runAsyncProcess(
       printCall: true,
@@ -624,9 +629,9 @@ team_id("$teamId")
     );
 
     if (flutterPublish.isDryRun) {
-      print('Did NOT publish: Remove `--dry-run` flag for publishing.');
+      _logger.info('Did NOT publish: Remove `--dry-run` flag for publishing.');
     } else {
-      print('Publish...');
+      _logger.info('Publish...');
       if (!isProduction) {
         await runProcess(
           'fastlane',

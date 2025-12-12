@@ -4,6 +4,9 @@ import 'package:dart_release/dart_release.dart';
 import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
 import 'package:flutter_release/publish.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger('Web');
 
 /// Build the app for Web.
 class WebPlatformBuild extends PlatformBuild {
@@ -50,9 +53,9 @@ class WebServerDistributor extends PublishDistributor {
 
   @override
   Future<void> publish() async {
-    print('Build application...');
+    _logger.info('Build application...');
     final outputPath = await platformBuild.build();
-    print('Build artifact path: $outputPath');
+    _logger.info('Build artifact path: $outputPath');
     final outputFile = File(outputPath);
 
     // Create tmp folder
