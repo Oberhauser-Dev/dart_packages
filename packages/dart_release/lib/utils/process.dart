@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:logging/logging.dart';
+
+final _runProcessLogger = Logger('runProcess');
+
 Future<ProcessResult> runProcess(
   String executable,
   List<String> arguments, {
@@ -12,9 +16,8 @@ Future<ProcessResult> runProcess(
   Encoding? stderrEncoding = systemEncoding,
   bool printCall = false,
 }) async {
-  if (printCall) {
-    print('$executable ${arguments.join(' ')}');
-  }
+  _runProcessLogger.log(printCall ? Level.INFO : Level.FINE,
+      '$executable ${arguments.join(' ')}');
   final result = await Process.run(
     executable,
     arguments,
@@ -25,11 +28,17 @@ Future<ProcessResult> runProcess(
     stdoutEncoding: stdoutEncoding,
     stderrEncoding: stderrEncoding,
   );
+
+  if (result.stdout != null) _runProcessLogger.finer(result.stdout);
+  if (result.stderr != null) _runProcessLogger.severe(result.stderr);
+
   if (result.exitCode != 0) throw Exception(result.stderr.toString());
   return result;
 }
 
-Future<Process> runAsyncProcess(
+final _runAsyncProcessLogger = Logger('runAsyncProcess');
+
+Future<ProcessResult> runAsyncProcess(
   String executable,
   List<String> arguments, {
   String? workingDirectory,
@@ -38,9 +47,8 @@ Future<Process> runAsyncProcess(
   bool runInShell = false,
   bool printCall = false,
 }) async {
-  if (printCall) {
-    print('$executable ${arguments.join(' ')}');
-  }
+  _runAsyncProcessLogger.log(printCall ? Level.INFO : Level.FINE,
+      '$executable ${arguments.join(' ')}');
   final result = await Process.start(
     executable,
     arguments,
@@ -49,12 +57,27 @@ Future<Process> runAsyncProcess(
     includeParentEnvironment: includeParentEnvironment,
     runInShell: runInShell,
   );
-  stdout.addStream(result.stdout);
-  stderr.addStream(result.stderr);
-  if (await result.exitCode != 0) {
+
+  final stdOutLines = [];
+  result.stdout.forEach((line) {
+    final stdOutLine = utf8.decode(line);
+    stdOutLines.add(stdOutLine);
+    _runAsyncProcessLogger.fine(stdOutLine);
+  });
+
+  final stdErrLines = [];
+  result.stderr.forEach((line) {
+    final stdErrLine = utf8.decode(line);
+    stdErrLines.add(stdErrLine);
+    _runAsyncProcessLogger.severe(stdErrLine);
+  });
+
+  final resultCode = await result.exitCode;
+  if (resultCode != 0) {
     throw Exception('Process "$executable" failed. See log above.');
   }
-  return result;
+  return ProcessResult(
+      result.pid, resultCode, stdOutLines.join('\n'), stdErrLines.join('\n'));
 }
 
 Future<ProcessResult> runBash(
@@ -67,9 +90,8 @@ Future<ProcessResult> runBash(
   Encoding? stderrEncoding = systemEncoding,
   bool printCall = false,
 }) async {
-  if (printCall) {
-    print('$executable ${arguments.join(' ')}');
-  }
+  _runAsyncProcessLogger.log(printCall ? Level.INFO : Level.FINE,
+      '$executable ${arguments.join(' ')}');
   final result = await Process.run(
     'bash',
     ['-c', '$executable ${arguments.join(' ')}'],
@@ -81,6 +103,9 @@ Future<ProcessResult> runBash(
     stdoutEncoding: stdoutEncoding,
     stderrEncoding: stderrEncoding,
   );
+  if (result.stdout != null) _runProcessLogger.finer(result.stdout);
+  if (result.stderr != null) _runProcessLogger.severe(result.stderr);
+
   if (result.exitCode != 0) throw Exception(result.stderr.toString());
   return result;
 }

@@ -31,11 +31,15 @@ Or remove them afterward:
 MY_BASE_64="${MY_BASE_64//$'\n'/}"
 ```
 
-## Options:
+## Options & Flags
 
+Options:
 - `main-path`: The Dart entry point
 - `app-name`: The name of the app executable
 - `app-version`: Semantic version of the release (like `v1.2.3`), see https://semver.org/
+
+Flags:
+- `verbose`: Enable verbose logging
 
 ## Supported Features
 
