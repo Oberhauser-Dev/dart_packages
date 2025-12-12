@@ -6,6 +6,9 @@ import 'package:flutter_release/build.dart';
 import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
 import 'package:flutter_release/tool_installation.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger('Android');
 
 /// Build the app for Android.
 class AndroidPlatformBuild extends PlatformBuild {
@@ -56,7 +59,10 @@ class AndroidPlatformBuild extends PlatformBuild {
         keyStorePassword != null &&
         keyAlias != null &&
         keyPassword != null) {
-      // Check if key signing is prepared
+      _logger.fine(
+          'Prepare Signing credentials in file "$_androidDirectory/key.properties"');
+
+      // Check if key signing is configured in build.gradle
       var buildGradleFile = File('$_androidDirectory/app/build.gradle.kts');
       if (!(await buildGradleFile.exists())) {
         buildGradleFile = File('$_androidDirectory/app/build.gradle');
@@ -85,13 +91,15 @@ storeFile=${keyStoreFile.absolute.path}
     ''';
       await File('$_androidDirectory/key.properties')
           .writeAsString(signingKeys);
+    } else {
+      _logger.fine('Skip signing.');
     }
 
     final buildMetadata =
         flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
     if (int.tryParse(buildMetadata) == null) {
       if (buildMetadata.isNotEmpty) {
-        print(
+        _logger.warning(
             'Non integer values for build metadata are not supported on Android. Omitting "$buildMetadata".');
       }
       flutterBuild.buildVersion =
@@ -125,7 +133,7 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
 
   @override
   Future<void> publish() async {
-    print('Install dependencies...');
+    _logger.info('Install dependencies...');
     if (!await isInstalled('fastlane')) {
       await ensureInstalled('ruby');
       await ensureInstalled('ruby-dev');
@@ -191,7 +199,7 @@ package_name("$packageName")
       if (versionCode != null) {
         // Increase versionCode by 1, if available:
         versionCode++;
-        print(
+        _logger.info(
           'Use "$versionCode" as next version code (fetched from Google Play).',
         );
 
@@ -202,16 +210,16 @@ package_name("$packageName")
       }
     }
 
-    print('Build application...');
+    _logger.info('Build application...');
 
     final outputPath = await platformBuild.build();
-    print('Build artifact path: $outputPath');
+    _logger.info('Build artifact path: $outputPath');
     final outputFile = File(outputPath);
 
     if (flutterPublish.isDryRun) {
-      print('Did NOT publish: Remove `--dry-run` flag for publishing.');
+      _logger.info('Did NOT publish: Remove `--dry-run` flag for publishing.');
     } else {
-      print('Publish...');
+      _logger.info('Publish...');
       await runProcess(
         'fastlane',
         [
