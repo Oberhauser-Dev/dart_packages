@@ -77,7 +77,7 @@ class DartBuild {
   Future<String> build() async {
     await Directory(buildFolder).create(recursive: true);
     final executable = '$buildFolder/$executableName';
-    await runProcess(
+    await runAsyncProcess(
       dartSdkPath,
       [
         'compile',

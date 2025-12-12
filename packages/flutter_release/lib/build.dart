@@ -69,7 +69,7 @@ class FlutterBuild {
     if (buildVersion.build.isNotEmpty) {
       buildNumber = buildVersion.build.map((p) => p.toString()).join('.');
     }
-    final result = await runProcess(
+    final result = await runAsyncProcess(
       flutterSdkPath,
       [
         'build',
@@ -89,7 +89,6 @@ class FlutterBuild {
           '--flavor',
           flavor!,
         ],
-        // Try to avoid verbose mode "-v", otherwise the result string "✓ Built xxx" cannot be found.
       ],
       printCall: true,
       // Must run in shell to correctly resolve paths on Windows
@@ -105,12 +104,16 @@ class FlutterBuild {
     final lines = splitter.convert(output);
 
     final regExp = RegExp(r'Built\s+([^\n()]+)');
-    final match = regExp.firstMatch(lines.last);
-    if (match == null) {
-      return null;
+    for (final line in lines) {
+      final match = regExp.firstMatch(line);
+      if (match == null) continue;
+      String? res = match.group(1);
+      if (res == null) continue;
+      res = res.trim();
+      if (res.isEmpty) continue;
+      return res;
     }
-
-    return match.group(1)?.trim();
+    return null;
   }
 
   /// Get the output path, where the artifact should be placed.
