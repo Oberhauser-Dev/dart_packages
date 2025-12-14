@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-12-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.12`](#dart_release---v0212)
+ - [`flutter_release` - `v0.3.5`](#flutter_release---v035)
+
+---
+
+#### `dart_release` - `v0.2.12`
+
+ - **FEAT**: Execute flutter build asynchronously. ([6194c289](https://github.com/Oberhauser-Dev/dart_packages/commit/6194c289710cfff646488219c18f6b48ec5b6268))
+ - **FEAT**: Support verbose logging. ([35637b81](https://github.com/Oberhauser-Dev/dart_packages/commit/35637b814b7caa2a92e0b559298ac10d99ed124c))
+
+#### `flutter_release` - `v0.3.5`
+
+ - **FEAT**: Migrate to logging package. ([4e62b03a](https://github.com/Oberhauser-Dev/dart_packages/commit/4e62b03ae081c275cf0617399a0716304e181735))
+ - **FEAT**: Execute flutter build asynchronously. ([6194c289](https://github.com/Oberhauser-Dev/dart_packages/commit/6194c289710cfff646488219c18f6b48ec5b6268))
+ - **FEAT**: Support verbose logging. ([35637b81](https://github.com/Oberhauser-Dev/dart_packages/commit/35637b814b7caa2a92e0b559298ac10d99ed124c))
+
+
 ## 2025-11-12
 
 ### Changes

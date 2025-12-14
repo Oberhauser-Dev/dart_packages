@@ -1,3 +1,9 @@
+## 0.3.5
+
+ - **FEAT**: Migrate to logging package. ([4e62b03a](https://github.com/Oberhauser-Dev/dart_packages/commit/4e62b03ae081c275cf0617399a0716304e181735))
+ - **FEAT**: Execute flutter build asynchronously. ([6194c289](https://github.com/Oberhauser-Dev/dart_packages/commit/6194c289710cfff646488219c18f6b48ec5b6268))
+ - **FEAT**: Support verbose logging. ([35637b81](https://github.com/Oberhauser-Dev/dart_packages/commit/35637b814b7caa2a92e0b559298ac10d99ed124c))
+
 ## 0.3.4
 
  - **PERF**: Add skip_waiting_for_build_processing to iOS upload (closes [#48](https://github.com/Oberhauser-Dev/dart_packages/issues/48)). ([c36f970e](https://github.com/Oberhauser-Dev/dart_packages/commit/c36f970e4b10f454ac9a85aa240ae2ced97f65c4))

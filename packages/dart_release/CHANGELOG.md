@@ -1,3 +1,8 @@
+## 0.2.12
+
+ - **FEAT**: Execute flutter build asynchronously. ([6194c289](https://github.com/Oberhauser-Dev/dart_packages/commit/6194c289710cfff646488219c18f6b48ec5b6268))
+ - **FEAT**: Support verbose logging. ([35637b81](https://github.com/Oberhauser-Dev/dart_packages/commit/35637b814b7caa2a92e0b559298ac10d99ed124c))
+
 ## 0.2.11
 
  - **FEAT**: Support more Cpu architectures. ([b50543c5](https://github.com/Oberhauser-Dev/dart_packages/commit/b50543c5677cd64fba3def6fc342ee4096653c29))
