@@ -34,5 +34,6 @@ void main() {
         FlutterBuild.parseFlutterBuildResult(
             'asdf build/ios/iphoneos/Runner.app (51.9MB)'),
         null);
+    expect(FlutterBuild.parseFlutterBuildResult('Built Example'), null);
   });
 }
