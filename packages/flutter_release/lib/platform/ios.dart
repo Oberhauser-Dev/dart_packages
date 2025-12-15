@@ -223,7 +223,7 @@ class IosPlatformBuild extends PlatformBuild {
     required super.flutterBuild,
   });
 
-  /// Build the artifact for iOS App Store. It creates a .ipa bundle.
+  /// Build the artifact of iOS files. It creates an archive bundle.
   Future<String> _buildIosApp() async {
     // TODO: Signing without App Store not feasible at the moment
     final filePath = await flutterBuild.build(buildCmd: 'ios');
