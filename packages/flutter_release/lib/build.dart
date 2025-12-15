@@ -108,7 +108,7 @@ class FlutterBuild {
     const splitter = LineSplitter();
     final lines = splitter.convert(output);
 
-    final regExp = RegExp(r'Built\s+([^\n()]+)');
+    final regExp = RegExp(r'Built\s+(build[^\n()]+)');
     for (final line in lines) {
       final match = regExp.firstMatch(line);
       if (match == null) continue;
