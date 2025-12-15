@@ -683,6 +683,12 @@ team_id("$teamId")
 
     // Get latest version code
     if (versionCodesStr == null) return null;
-    return int.tryParse(versionCodesStr);
+    final versionCode = int.tryParse(versionCodesStr);
+    if (versionCode == null) {
+      _logger.warning(
+          'Could not parse version code from App Store Connect: $versionCodesStr. You should set it manually.');
+      return null;
+    }
+    return versionCode;
   }
 }
