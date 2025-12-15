@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-12-15
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.12+1`](#dart_release---v02121)
+ - [`flutter_release` - `v0.3.5+1`](#flutter_release---v0351)
+
+---
+
+#### `dart_release` - `v0.2.12+1`
+
+ - **FIX**: Avoid empty logs. ([42c8460a](https://github.com/Oberhauser-Dev/dart_packages/commit/42c8460adc2d995889c68303f022c7800b8be9da))
+ - **FIX**: Add new line on log. ([ac027338](https://github.com/Oberhauser-Dev/dart_packages/commit/ac0273389c8d40f8d77e4dc00a84b6221cd8a6ee))
+
+#### `flutter_release` - `v0.3.5+1`
+
+ - **FIX**: Warn if version code cannot be parsed from App Store. ([f79a5fec](https://github.com/Oberhauser-Dev/dart_packages/commit/f79a5fec511f549c1c228c6a0a246cbe8240a9d6))
+ - **FIX**: Match correct line for build archive. ([3646713d](https://github.com/Oberhauser-Dev/dart_packages/commit/3646713dc37b26a4acb7bc695ce0d727b916d06c))
+ - **DOCS**: Fix comment on ios archive. ([7223db1f](https://github.com/Oberhauser-Dev/dart_packages/commit/7223db1f55af36ee8ebf7887ae0738d8d7cb7a05))
+
+
 ## 2025-12-14
 
 ### Changes

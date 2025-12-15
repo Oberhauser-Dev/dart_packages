@@ -1,3 +1,9 @@
+## 0.3.5+1
+
+ - **FIX**: Warn if version code cannot be parsed from App Store. ([f79a5fec](https://github.com/Oberhauser-Dev/dart_packages/commit/f79a5fec511f549c1c228c6a0a246cbe8240a9d6))
+ - **FIX**: Match correct line for build archive. ([3646713d](https://github.com/Oberhauser-Dev/dart_packages/commit/3646713dc37b26a4acb7bc695ce0d727b916d06c))
+ - **DOCS**: Fix comment on ios archive. ([7223db1f](https://github.com/Oberhauser-Dev/dart_packages/commit/7223db1f55af36ee8ebf7887ae0738d8d7cb7a05))
+
 ## 0.3.5
 
  - **FEAT**: Migrate to logging package. ([4e62b03a](https://github.com/Oberhauser-Dev/dart_packages/commit/4e62b03ae081c275cf0617399a0716304e181735))
