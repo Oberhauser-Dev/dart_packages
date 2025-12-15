@@ -1,3 +1,8 @@
+## 0.2.12+1
+
+ - **FIX**: Avoid empty logs. ([42c8460a](https://github.com/Oberhauser-Dev/dart_packages/commit/42c8460adc2d995889c68303f022c7800b8be9da))
+ - **FIX**: Add new line on log. ([ac027338](https://github.com/Oberhauser-Dev/dart_packages/commit/ac0273389c8d40f8d77e4dc00a84b6221cd8a6ee))
+
 ## 0.2.12
 
  - **FEAT**: Execute flutter build asynchronously. ([6194c289](https://github.com/Oberhauser-Dev/dart_packages/commit/6194c289710cfff646488219c18f6b48ec5b6268))
