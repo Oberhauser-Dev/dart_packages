@@ -11,7 +11,7 @@ void setupLogging(bool isVerbose) {
     final stackTraceStr =
         record.stackTrace != null ? '\n${record.stackTrace}' : '';
     final res =
-        '[${record.level.name}] ${record.time}: ${record.message}$errorStr$stackTraceStr';
+        '[${record.level.name}] ${record.time}: ${record.message}$errorStr$stackTraceStr\n';
     if (record.level >= Level.SEVERE) {
       stderr.write(res);
     } else {
