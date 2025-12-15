@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:logging/logging.dart';
 
@@ -29,8 +30,11 @@ Future<ProcessResult> runProcess(
     stderrEncoding: stderrEncoding,
   );
 
-  if (result.stdout != null) _runProcessLogger.finer(result.stdout);
-  if (result.stderr != null) _runProcessLogger.severe(result.stderr);
+  final stdOut = result.stdout;
+  if (stdOut is String && stdOut.isNotEmpty) _runProcessLogger.finer(stdOut);
+
+  final stdErr = result.stderr;
+  if (stdErr is String && stdErr.isNotEmpty) _runProcessLogger.severe(stdErr);
 
   if (result.exitCode != 0) throw Exception(result.stderr.toString());
   return result;
@@ -58,16 +62,18 @@ Future<ProcessResult> runAsyncProcess(
     runInShell: runInShell,
   );
 
-  final stdOutLines = [];
+  final List<String> stdOutLines = [];
   result.stdout.forEach((line) {
     final stdOutLine = utf8.decode(line);
+    if (stdOutLine.isEmpty) return;
     stdOutLines.add(stdOutLine);
     _runAsyncProcessLogger.fine(stdOutLine);
   });
 
-  final stdErrLines = [];
+  final List<String> stdErrLines = [];
   result.stderr.forEach((line) {
     final stdErrLine = utf8.decode(line);
+    if (stdErrLine.isEmpty) return;
     stdErrLines.add(stdErrLine);
     _runAsyncProcessLogger.severe(stdErrLine);
   });
@@ -77,7 +83,11 @@ Future<ProcessResult> runAsyncProcess(
     throw Exception('Process "$executable" failed. See log above.');
   }
   return ProcessResult(
-      result.pid, resultCode, stdOutLines.join('\n'), stdErrLines.join('\n'));
+    result.pid,
+    resultCode,
+    stdOutLines.join('\n'),
+    stdErrLines.isEmpty ? Uint8List(0) : stdErrLines.join('\n'),
+  );
 }
 
 Future<ProcessResult> runBash(
@@ -103,8 +113,12 @@ Future<ProcessResult> runBash(
     stdoutEncoding: stdoutEncoding,
     stderrEncoding: stderrEncoding,
   );
-  if (result.stdout != null) _runProcessLogger.finer(result.stdout);
-  if (result.stderr != null) _runProcessLogger.severe(result.stderr);
+
+  final stdOut = result.stdout;
+  if (stdOut is String && stdOut.isNotEmpty) _runProcessLogger.finer(stdOut);
+
+  final stdErr = result.stderr;
+  if (stdErr is String && stdErr.isNotEmpty) _runProcessLogger.severe(stdErr);
 
   if (result.exitCode != 0) throw Exception(result.stderr.toString());
   return result;
