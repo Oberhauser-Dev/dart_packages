@@ -14,6 +14,15 @@ const apiKeyJsonFileName = 'ApiAuth.json';
 
 final _logger = Logger('iOS');
 
+FileSystemEntity? _getLatestFileByExtension(
+    List<FileSystemEntity> entities, String extension) {
+  return entities
+      .where((file) => file.uri.pathSegments.last.endsWith(extension))
+      .toList()
+      .sorted((a, b) => b.statSync().modified.compareTo(a.statSync().modified))
+      .firstOrNull;
+}
+
 Future<String> generateApiKeyJson({
   required String apiPrivateKeyBase64,
   required String apiKeyId,
@@ -151,16 +160,6 @@ flutter_release publish ios-app-store \
     print(exampleCommand);
   }
 
-  FileSystemEntity? _getLatestFileByExtension(
-      List<FileSystemEntity> entities, String extension) {
-    return entities
-        .where((file) => file.uri.pathSegments.last.endsWith(extension))
-        .toList()
-        .sorted(
-            (a, b) => b.statSync().modified.compareTo(a.statSync().modified))
-        .firstOrNull;
-  }
-
   Future<(String, String)> createCertificate({
     required bool isDevelopment,
     String? apiKeyJsonPath,
@@ -250,12 +249,23 @@ class IosPlatformBuild extends PlatformBuild {
     // Ipa build will fail resolving the provisioning profile, this is done later by fastlane.
     final filePath = await flutterBuild.build(buildCmd: 'ipa');
 
-    // Does not create ipa at this point
-    // final artifactPath =
-    //     flutterBuild.getArtifactPath(platform: 'ios', extension: 'ipa');
-    // final file = File('build/app/outputs/flutter-apk/app-release.apk');
-    // await file.rename(artifactPath);
-    return filePath ?? '';
+    // IPA building can fail silently.
+    // Also the filePath usually is build/ios/archive/Runner.xcarchive which is not the final ipa.
+    String? artifactPath;
+
+    final iosDir = Directory('build/ios/ipa');
+    if (!await iosDir.exists()) {
+      return '';
+    }
+    final entities = await iosDir.list().toList();
+    FileSystemEntity? ipaEntity = _getLatestFileByExtension(entities, '.ipa');
+    if (ipaEntity == null) {
+      return '';
+    }
+    artifactPath =
+        flutterBuild.getArtifactPath(platform: 'ios', extension: 'ipa');
+    await ipaEntity.rename(artifactPath);
+    return artifactPath;
   }
 
   /// Build the artifact for iOS. Not supported as it requires signing.
@@ -600,33 +610,38 @@ team_id("$teamId")
 
     // Build xcarchive only
     final outputPath = await platformBuild.build();
-    _logger.info('Build artifact path: $outputPath');
+    File? outputFile;
 
-    _logger.info('Build via flutter command finished. '
-        'This usually fails using the provisioning profiles.\n'
-        'Therefore the app is now build again with fastlane. '
-        'See: https://docs.flutter.dev/deployment/cd, '
-        'and https://github.com/flutter/flutter/issues/106612');
+    if (outputPath.isEmpty) {
+      _logger.warning('Build via flutter command finished failed silently. '
+          'This can happen using manual signing with provisioning profiles.\n'
+          'Therefore the app is now build again with fastlane. '
+          'See: https://docs.flutter.dev/deployment/cd, '
+          'and https://github.com/flutter/flutter/issues/106612');
 
-    // Build signed ipa
-    // https://docs.flutter.dev/deployment/cd
-    // https://github.com/flutter/flutter/issues/106612
+      // Build signed ipa
+      // https://docs.flutter.dev/deployment/cd
+      // https://github.com/flutter/flutter/issues/106612
 
-    _logger.info('Using XCode scheme "$xcodeScheme" to build the project.');
+      _logger.info('Using XCode scheme "$xcodeScheme" to build the project.');
 
-    await runAsyncProcess(
-      printCall: true,
-      'fastlane',
-      [
-        'run',
-        'build_app',
-        'scheme:$xcodeScheme',
-        'skip_build_archive:true',
-        'archive_path:../build/ios/archive/Runner.xcarchive',
-      ],
-      environment: {'FASTLANE_XCODEBUILD_SETTINGS_RETRIES': '15'},
-      workingDirectory: _iosDirectory,
-    );
+      await runAsyncProcess(
+        printCall: true,
+        'fastlane',
+        [
+          'run',
+          'build_app',
+          'scheme:$xcodeScheme',
+          'skip_build_archive:true',
+          'archive_path:../build/ios/archive/Runner.xcarchive',
+        ],
+        environment: {'FASTLANE_XCODEBUILD_SETTINGS_RETRIES': '15'},
+        workingDirectory: _iosDirectory,
+      );
+    } else {
+      _logger.info('Build artifact path: $outputPath');
+      outputFile = File(outputPath);
+    }
 
     if (flutterPublish.isDryRun) {
       _logger.info('Did NOT publish: Remove `--dry-run` flag for publishing.');
@@ -641,7 +656,11 @@ team_id("$teamId")
             'upload',
             '--skip_waiting_for_build_processing',
             '--api_key_path',
-            apiKeyJsonPath
+            apiKeyJsonPath,
+            if (outputFile != null) ...[
+              '--ipa',
+              outputFile.absolute.path,
+            ],
           ],
           workingDirectory: _iosDirectory,
           printCall: true,
