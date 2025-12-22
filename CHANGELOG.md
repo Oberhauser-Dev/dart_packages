@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-12-22
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_release` - `v0.3.5+2`](#flutter_release---v0352)
+
+---
+
+#### `flutter_release` - `v0.3.5+2`
+
+ - **FIX**(ios): Support building IPA directly. ([b68ea8d5](https://github.com/Oberhauser-Dev/dart_packages/commit/b68ea8d5fb9cd021a1b9640a783dee6e53b98da1))
+
+
 ## 2025-12-15
 
 ### Changes

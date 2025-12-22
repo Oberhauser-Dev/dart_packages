@@ -1,3 +1,7 @@
+## 0.3.5+2
+
+ - **FIX**(ios): Support building IPA directly. ([b68ea8d5](https://github.com/Oberhauser-Dev/dart_packages/commit/b68ea8d5fb9cd021a1b9640a783dee6e53b98da1))
+
 ## 0.3.5+1
 
  - **FIX**: Warn if version code cannot be parsed from App Store. ([f79a5fec](https://github.com/Oberhauser-Dev/dart_packages/commit/f79a5fec511f549c1c228c6a0a246cbe8240a9d6))
