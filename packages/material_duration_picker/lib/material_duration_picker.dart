@@ -2104,6 +2104,122 @@ class DurationPickerDialog extends StatefulWidget {
   State<DurationPickerDialog> createState() => _DurationPickerDialogState();
 }
 
+class DurationPickerTextButtons {
+  const DurationPickerTextButtons({
+    this.enable = true,
+    this.cancelText,
+    this.confirmText,
+    this.onCancel,
+    this.onConfirm,
+  });
+
+  /// Whether to show [cancelText] and [confirmText] buttons.
+  final bool enable;
+
+  /// Optionally provide your own text for the cancel button.
+  ///
+  /// If null, the button uses [MaterialLocalizations.cancelButtonLabel].
+  final String? cancelText;
+
+  /// Optionally provide your own text for the confirm button.
+  ///
+  /// If null, the button uses [MaterialLocalizations.okButtonLabel].
+  final String? confirmText;
+
+  /// Callback for when the cancel button is tapped. If null, the cancel button will pop the dialog with no result.
+  final VoidCallback? onCancel;
+
+  /// Callback for when the confirm button is tapped. If null, the confirm button will pop the dialog with the selected duration as the result.
+  final VoidCallback? onConfirm;
+}
+
+class DurationPickerWidget extends StatefulWidget {
+  const DurationPickerWidget({
+    super.key,
+    this.initialDuration,
+    this.textButtons,
+    this.helpText,
+    this.errorInvalidText,
+    this.hourLabelText,
+    this.minuteLabelText,
+    this.secondLabelText,
+    this.restorationId,
+    this.initialEntryMode = DurationPickerEntryMode.dial,
+    this.durationPickerMode = DurationPickerMode.hms,
+    this.orientation,
+    this.onEntryModeChanged,
+    this.switchToInputEntryModeIcon,
+    this.switchToTimerEntryModeIcon,
+  });
+
+  /// The time initially selected when the dialog is shown.
+  final Duration? initialDuration;
+
+  /// Buttons configuration showed at the bottom of the dialog.
+  /// If null, the default Cancel and OK buttons are used.
+  final DurationPickerTextButtons? textButtons;
+
+  /// Optionally provide your own help text to the header of the time picker.
+  final String? helpText;
+
+  /// Optionally provide your own validation error text.
+  final String? errorInvalidText;
+
+  /// Optionally provide your own hour label text.
+  final String? hourLabelText;
+
+  /// Optionally provide your own minute label text.
+  final String? minuteLabelText;
+
+  /// Optionally provide your own second label text.
+  final String? secondLabelText;
+
+  /// Restoration ID to save and restore the state of the [DurationPickerDialog].
+  ///
+  /// If it is non-null, the time picker will persist and restore the
+  /// dialog's state.
+  ///
+  /// The state of this widget is persisted in a [RestorationBucket] claimed
+  /// from the surrounding [RestorationScope] using the provided restoration ID.
+  ///
+  /// See also:
+  ///
+  ///  * [RestorationManager], which explains how state restoration works in
+  ///    Flutter.
+  final String? restorationId;
+
+  /// The entry mode for the picker. Whether it's text input or a dial.
+  final DurationPickerEntryMode initialEntryMode;
+
+  /// The duration picker mode. Whether it's hours, minutes, or seconds input.
+  final DurationPickerMode durationPickerMode;
+
+  /// The optional [orientation] parameter sets the [Orientation] to use when
+  /// displaying the dialog.
+  ///
+  /// By default, the orientation is derived from the [MediaQueryData.size] of
+  /// the ambient [MediaQuery]. If the aspect of the size is tall, then
+  /// [Orientation.portrait] is used, if the size is wide, then
+  /// [Orientation.landscape] is used.
+  ///
+  /// Use this parameter to override the default and force the dialog to appear
+  /// in either portrait or landscape mode regardless of the aspect of the
+  /// [MediaQueryData.size].
+  final Orientation? orientation;
+
+  /// Callback called when the selected entry mode is changed.
+  final DurationEntryModeChangeCallback? onEntryModeChanged;
+
+  /// {@macro flutter.material.time_picker.switchToInputEntryModeIcon}
+  final Icon? switchToInputEntryModeIcon;
+
+  /// {@macro flutter.material.time_picker.switchToTimerEntryModeIcon}
+  final Icon? switchToTimerEntryModeIcon;
+
+  @override
+  State<DurationPickerWidget> createState() => _DurationPickerWidgetState();
+}
+
 class _DurationPickerDialogState extends State<DurationPickerDialog> with RestorationMixin {
   late final RestorableEnum<DurationPickerEntryMode> _entryMode =
       RestorableEnum<DurationPickerEntryMode>(
@@ -2420,6 +2536,365 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> with Restor
                               helpText: widget.helpText,
                               cancelText: widget.cancelText,
                               confirmText: widget.confirmText,
+                              errorInvalidText: widget.errorInvalidText,
+                              hourLabelText: widget.hourLabelText,
+                              minuteLabelText: widget.minuteLabelText,
+                              secondLabelText: widget.secondLabelText,
+                              restorationId: 'time_picker',
+                              entryMode: _entryMode.value,
+                              durationPickerMode: widget.durationPickerMode,
+                              orientation: widget.orientation,
+                              onEntryModeChanged: _handleEntryModeChanged,
+                              switchToInputEntryModeIcon: widget.switchToInputEntryModeIcon,
+                              switchToTimerEntryModeIcon: widget.switchToTimerEntryModeIcon,
+                            ),
+                          );
+                          if (_entryMode.value != DurationPickerEntryMode.input &&
+                              _entryMode.value != DurationPickerEntryMode.inputOnly) {
+                            return Flexible(child: child);
+                          }
+                          return child;
+                        },
+                      ),
+                      actions,
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _DurationPickerWidgetState extends State<DurationPickerWidget> with RestorationMixin {
+  late final RestorableEnum<DurationPickerEntryMode> _entryMode =
+      RestorableEnum<DurationPickerEntryMode>(
+    widget.initialEntryMode,
+    values: DurationPickerEntryMode.values,
+  );
+  late final RestorableDuration _selectedDuration = RestorableDuration(
+    widget.initialDuration ?? Duration.zero,
+  );
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final RestorableEnum<AutovalidateMode> _autovalidateMode = RestorableEnum<AutovalidateMode>(
+    AutovalidateMode.disabled,
+    values: AutovalidateMode.values,
+  );
+  late final RestorableEnumN<Orientation> _orientation = RestorableEnumN<Orientation>(
+    widget.orientation,
+    values: Orientation.values,
+  );
+
+  // Base sizes
+  static const Size _kTimePickerPortraitSize = Size(310, 468);
+  static const Size _kTimePickerLandscapeSize = Size(524, 342);
+  static const Size _kTimePickerLandscapeSizeM2 = Size(508, 300);
+  static const Size _kTimePickerInputSize = Size(312, 252);
+  static const double _kTimePickerInputMinimumHeight = 216;
+
+  // Absolute minimum dialog sizes, which is the point at which it begins
+  // scrolling to fit everything in.
+  static const Size _kTimePickerMinPortraitSize = Size(238, 326);
+  static const Size _kTimePickerMinLandscapeSize = Size(416, 248);
+  static const Size _kTimePickerMinInputSize = Size(312, 196);
+
+  @override
+  void dispose() {
+    _selectedDuration.dispose();
+    _entryMode.dispose();
+    _autovalidateMode.dispose();
+    _orientation.dispose();
+    super.dispose();
+  }
+
+  @override
+  String? get restorationId => widget.restorationId;
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_selectedDuration, 'selected_duration');
+    registerForRestoration(_entryMode, 'entry_mode');
+    registerForRestoration(_autovalidateMode, 'autovalidate_mode');
+    registerForRestoration(_orientation, 'orientation');
+  }
+
+  void _handleTimeChanged(Duration value) {
+    if (value != _selectedDuration.value) {
+      setState(() {
+        _selectedDuration.value = value;
+      });
+    }
+  }
+
+  void _handleEntryModeChanged(DurationPickerEntryMode value) {
+    if (value != _entryMode.value) {
+      setState(() {
+        switch (_entryMode.value) {
+          case DurationPickerEntryMode.dial:
+            _autovalidateMode.value = AutovalidateMode.disabled;
+          case DurationPickerEntryMode.input:
+            _formKey.currentState!.save();
+          case DurationPickerEntryMode.dialOnly:
+            break;
+          case DurationPickerEntryMode.inputOnly:
+            break;
+        }
+        _entryMode.value = value;
+        widget.onEntryModeChanged?.call(value);
+      });
+    }
+  }
+
+  void _toggleEntryMode() {
+    switch (_entryMode.value) {
+      case DurationPickerEntryMode.dial:
+        _handleEntryModeChanged(DurationPickerEntryMode.input);
+      case DurationPickerEntryMode.input:
+        _handleEntryModeChanged(DurationPickerEntryMode.dial);
+      case DurationPickerEntryMode.dialOnly:
+      case DurationPickerEntryMode.inputOnly:
+        FlutterError('Can not change entry mode from $_entryMode');
+    }
+  }
+
+  void _handleCancel() {
+    if (widget.textButtons?.onCancel != null) {
+      widget.textButtons!.onCancel!();
+      return;
+    }
+    Navigator.pop(context);
+  }
+
+  void _handleOk() {
+    if (_entryMode.value == DurationPickerEntryMode.input ||
+        _entryMode.value == DurationPickerEntryMode.inputOnly) {
+      final FormState form = _formKey.currentState!;
+      if (!form.validate()) {
+        setState(() {
+          _autovalidateMode.value = AutovalidateMode.always;
+        });
+        return;
+      }
+      form.save();
+    }
+    if (widget.textButtons?.onConfirm != null) {
+      widget.textButtons!.onConfirm!();
+      return;
+    }
+
+    Navigator.pop(context, _selectedDuration.value);
+  }
+
+  Size _minDialogSize(BuildContext context, {required bool useMaterial3}) {
+    final Orientation orientation = _orientation.value ?? MediaQuery.orientationOf(context);
+
+    switch (_entryMode.value) {
+      case DurationPickerEntryMode.dial:
+      case DurationPickerEntryMode.dialOnly:
+        return switch (orientation) {
+          Orientation.portrait => _kTimePickerMinPortraitSize,
+          Orientation.landscape => _kTimePickerMinLandscapeSize,
+        };
+      case DurationPickerEntryMode.input:
+      case DurationPickerEntryMode.inputOnly:
+        final MaterialDurationPickerLocalizations localizations =
+            MaterialDurationPickerLocalizations.of(context);
+        final DurationFormat durationFormat = localizations.durationFormat();
+        final double timePickerWidth;
+        switch (durationFormat) {
+          case DurationFormat.HH_colon_mm:
+          case DurationFormat.HH_dot_mm:
+          case DurationFormat.frenchCanadian:
+          case DurationFormat.H_colon_mm:
+            final _TimePickerDefaults defaultTheme =
+                useMaterial3 ? _TimePickerDefaultsM3(context) : _TimePickerDefaultsM2(context);
+            timePickerWidth =
+                _kTimePickerMinInputSize.width - defaultTheme.dayPeriodPortraitSize.width - 12;
+        }
+        return Size(timePickerWidth, _kTimePickerMinInputSize.height);
+    }
+  }
+
+  Size _dialogSize(BuildContext context, {required bool useMaterial3}) {
+    final Orientation orientation = _orientation.value ?? MediaQuery.orientationOf(context);
+    // Constrain the textScaleFactor to prevent layout issues. Since only some
+    // parts of the time picker scale up with textScaleFactor, we cap the factor
+    // to 1.1 as that provides enough space to reasonably fit all the content.
+    //
+    // 14 is a common font size used to compute the effective text scale.
+    const double fontSizeToScale = 14.0;
+    final double textScaleFactor =
+        MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.1).scale(fontSizeToScale) /
+            fontSizeToScale;
+
+    final Size timePickerSize;
+    switch (_entryMode.value) {
+      case DurationPickerEntryMode.dial:
+      case DurationPickerEntryMode.dialOnly:
+        switch (orientation) {
+          case Orientation.portrait:
+            timePickerSize = _kTimePickerPortraitSize;
+          case Orientation.landscape:
+            timePickerSize = Size(
+              _kTimePickerLandscapeSize.width * textScaleFactor,
+              useMaterial3 ? _kTimePickerLandscapeSize.height : _kTimePickerLandscapeSizeM2.height,
+            );
+        }
+      case DurationPickerEntryMode.input:
+      case DurationPickerEntryMode.inputOnly:
+        final MaterialDurationPickerLocalizations localizations =
+            MaterialDurationPickerLocalizations.of(context);
+        final DurationFormat durationFormat = localizations.durationFormat();
+        final double timePickerWidth;
+        switch (durationFormat) {
+          case DurationFormat.HH_colon_mm:
+          case DurationFormat.HH_dot_mm:
+          case DurationFormat.frenchCanadian:
+          case DurationFormat.H_colon_mm:
+            final _TimePickerDefaults defaultTheme =
+                useMaterial3 ? _TimePickerDefaultsM3(context) : _TimePickerDefaultsM2(context);
+            timePickerWidth =
+                _kTimePickerInputSize.width - defaultTheme.dayPeriodPortraitSize.width - 12;
+        }
+        timePickerSize = Size(timePickerWidth, _kTimePickerInputSize.height);
+    }
+    return Size(timePickerSize.width, timePickerSize.height * textScaleFactor);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    assert(debugCheckHasMediaQuery(context));
+    final ThemeData theme = Theme.of(context);
+    final TimePickerThemeData pickerTheme = TimePickerTheme.of(context);
+    final _TimePickerDefaults defaultTheme =
+        theme.useMaterial3 ? _TimePickerDefaultsM3(context) : _TimePickerDefaultsM2(context);
+    final ShapeBorder shape = pickerTheme.shape ?? defaultTheme.shape;
+    final Color entryModeIconColor =
+        pickerTheme.entryModeIconColor ?? defaultTheme.entryModeIconColor;
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+
+    final Widget actions = Padding(
+      padding: EdgeInsetsDirectional.only(start: theme.useMaterial3 ? 0 : 4),
+      child: Row(
+        children: <Widget>[
+          if (_entryMode.value == DurationPickerEntryMode.dial ||
+              _entryMode.value == DurationPickerEntryMode.input)
+            IconButton(
+              // In material3 mode, we want to use the color as part of the
+              // button style which applies its own opacity. In material2 mode,
+              // we want to use the color as the color, which already includes
+              // the opacity.
+              color: theme.useMaterial3 ? null : entryModeIconColor,
+              style: theme.useMaterial3
+                  ? IconButton.styleFrom(foregroundColor: entryModeIconColor)
+                  : null,
+              onPressed: _toggleEntryMode,
+              icon: _entryMode.value == DurationPickerEntryMode.dial
+                  ? widget.switchToInputEntryModeIcon ?? const Icon(Icons.keyboard_outlined)
+                  : widget.switchToTimerEntryModeIcon ?? const Icon(Icons.access_time),
+              tooltip: _entryMode.value == DurationPickerEntryMode.dial
+                  ? MaterialLocalizations.of(context).inputTimeModeButtonLabel
+                  : MaterialLocalizations.of(context).dialModeButtonLabel,
+            ),
+          if (widget.textButtons?.enable ?? true)
+            Expanded(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 36),
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: OverflowBar(
+                    spacing: 8,
+                    overflowAlignment: OverflowBarAlignment.end,
+                    children: <Widget>[
+                      TextButton(
+                        style: pickerTheme.cancelButtonStyle ?? defaultTheme.cancelButtonStyle,
+                        onPressed: _handleCancel,
+                        child: Text(
+                          widget.textButtons?.cancelText ??
+                              (theme.useMaterial3
+                                  ? localizations.cancelButtonLabel
+                                  : localizations.cancelButtonLabel.toUpperCase()),
+                        ),
+                      ),
+                      TextButton(
+                        style: pickerTheme.confirmButtonStyle ?? defaultTheme.confirmButtonStyle,
+                        onPressed: _handleOk,
+                        child: Text(widget.textButtons?.confirmText ?? localizations.okButtonLabel),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+
+    final Offset tapTargetSizeOffset = switch (theme.materialTapTargetSize) {
+      MaterialTapTargetSize.padded => Offset.zero,
+      // _dialogSize returns "padded" sizes.
+      MaterialTapTargetSize.shrinkWrap => const Offset(0, -12),
+    };
+    final Size dialogSize =
+        _dialogSize(context, useMaterial3: theme.useMaterial3) + tapTargetSizeOffset;
+    final Size minDialogSize =
+        _minDialogSize(context, useMaterial3: theme.useMaterial3) + tapTargetSizeOffset;
+    return Dialog(
+      shape: shape,
+      elevation: pickerTheme.elevation ?? defaultTheme.elevation,
+      backgroundColor: pickerTheme.backgroundColor ?? defaultTheme.backgroundColor,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: (_entryMode.value == DurationPickerEntryMode.input ||
+                _entryMode.value == DurationPickerEntryMode.inputOnly)
+            ? 0
+            : 24,
+      ),
+      child: Padding(
+        padding: pickerTheme.padding ?? defaultTheme.padding,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final Size constrainedSize = constraints.constrain(dialogSize);
+            final Size allowedSize = Size(
+              constrainedSize.width < minDialogSize.width
+                  ? minDialogSize.width
+                  : constrainedSize.width,
+              constrainedSize.height < minDialogSize.height
+                  ? minDialogSize.height
+                  : constrainedSize.height,
+            );
+            return SingleChildScrollView(
+              restorationId: 'time_picker_scroll_view_horizontal',
+              scrollDirection: Axis.horizontal,
+              child: SingleChildScrollView(
+                restorationId: 'time_picker_scroll_view_vertical',
+                child: AnimatedContainer(
+                  width: allowedSize.width,
+                  duration: _kDialogSizeAnimationDuration,
+                  curve: Curves.easeIn,
+                  constraints: BoxConstraints(
+                    minHeight: _kTimePickerInputMinimumHeight,
+                    maxHeight: allowedSize.height,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Builder(
+                        builder: (BuildContext context) {
+                          final Widget child = Form(
+                            key: _formKey,
+                            autovalidateMode: _autovalidateMode.value,
+                            child: _TimePicker(
+                              time: widget.initialDuration ?? Duration.zero,
+                              onTimeChanged: _handleTimeChanged,
+                              helpText: widget.helpText,
+                              cancelText: widget.textButtons?.cancelText,
+                              confirmText: widget.textButtons?.confirmText,
                               errorInvalidText: widget.errorInvalidText,
                               hourLabelText: widget.hourLabelText,
                               minuteLabelText: widget.minuteLabelText,
