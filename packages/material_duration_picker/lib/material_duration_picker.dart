@@ -2130,7 +2130,7 @@ class DurationPickerTextButtons {
   final VoidCallback? onCancel;
 
   /// Callback for when the confirm button is tapped. If null, the confirm button will pop the dialog with the selected duration as the result.
-  final VoidCallback? onConfirm;
+  final void Function(Duration)? onConfirm;
 }
 
 class DurationPickerWidget extends StatefulWidget {
@@ -2150,6 +2150,7 @@ class DurationPickerWidget extends StatefulWidget {
     this.onEntryModeChanged,
     this.switchToInputEntryModeIcon,
     this.switchToTimerEntryModeIcon,
+    this.scrollPhysics,
   });
 
   /// The time initially selected when the dialog is shown.
@@ -2215,6 +2216,8 @@ class DurationPickerWidget extends StatefulWidget {
 
   /// {@macro flutter.material.time_picker.switchToTimerEntryModeIcon}
   final Icon? switchToTimerEntryModeIcon;
+
+  final ScrollPhysics? scrollPhysics;
 
   @override
   State<DurationPickerWidget> createState() => _DurationPickerWidgetState();
@@ -2681,7 +2684,7 @@ class _DurationPickerWidgetState extends State<DurationPickerWidget> with Restor
       form.save();
     }
     if (widget.textButtons?.onConfirm != null) {
-      widget.textButtons!.onConfirm!();
+      widget.textButtons!.onConfirm!(_selectedDuration.value);
       return;
     }
 
@@ -2771,7 +2774,6 @@ class _DurationPickerWidgetState extends State<DurationPickerWidget> with Restor
     final TimePickerThemeData pickerTheme = TimePickerTheme.of(context);
     final _TimePickerDefaults defaultTheme =
         theme.useMaterial3 ? _TimePickerDefaultsM3(context) : _TimePickerDefaultsM2(context);
-    final ShapeBorder shape = pickerTheme.shape ?? defaultTheme.shape;
     final Color entryModeIconColor =
         pickerTheme.entryModeIconColor ?? defaultTheme.entryModeIconColor;
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
@@ -2842,87 +2844,77 @@ class _DurationPickerWidgetState extends State<DurationPickerWidget> with Restor
         _dialogSize(context, useMaterial3: theme.useMaterial3) + tapTargetSizeOffset;
     final Size minDialogSize =
         _minDialogSize(context, useMaterial3: theme.useMaterial3) + tapTargetSizeOffset;
-    return Dialog(
-      shape: shape,
-      elevation: pickerTheme.elevation ?? defaultTheme.elevation,
-      backgroundColor: pickerTheme.backgroundColor ?? defaultTheme.backgroundColor,
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: (_entryMode.value == DurationPickerEntryMode.input ||
-                _entryMode.value == DurationPickerEntryMode.inputOnly)
-            ? 0
-            : 24,
-      ),
-      child: Padding(
-        padding: pickerTheme.padding ?? defaultTheme.padding,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final Size constrainedSize = constraints.constrain(dialogSize);
-            final Size allowedSize = Size(
-              constrainedSize.width < minDialogSize.width
-                  ? minDialogSize.width
-                  : constrainedSize.width,
-              constrainedSize.height < minDialogSize.height
-                  ? minDialogSize.height
-                  : constrainedSize.height,
-            );
-            return SingleChildScrollView(
-              restorationId: 'time_picker_scroll_view_horizontal',
-              scrollDirection: Axis.horizontal,
-              child: SingleChildScrollView(
-                restorationId: 'time_picker_scroll_view_vertical',
-                child: AnimatedContainer(
-                  width: allowedSize.width,
-                  duration: _kDialogSizeAnimationDuration,
-                  curve: Curves.easeIn,
-                  constraints: BoxConstraints(
-                    minHeight: _kTimePickerInputMinimumHeight,
-                    maxHeight: allowedSize.height,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Builder(
-                        builder: (BuildContext context) {
-                          final Widget child = Form(
-                            key: _formKey,
-                            autovalidateMode: _autovalidateMode.value,
-                            child: _TimePicker(
-                              time: widget.initialDuration ?? Duration.zero,
-                              onTimeChanged: _handleTimeChanged,
-                              helpText: widget.helpText,
-                              cancelText: widget.textButtons?.cancelText,
-                              confirmText: widget.textButtons?.confirmText,
-                              errorInvalidText: widget.errorInvalidText,
-                              hourLabelText: widget.hourLabelText,
-                              minuteLabelText: widget.minuteLabelText,
-                              secondLabelText: widget.secondLabelText,
-                              restorationId: 'time_picker',
-                              entryMode: _entryMode.value,
-                              durationPickerMode: widget.durationPickerMode,
-                              orientation: widget.orientation,
-                              onEntryModeChanged: _handleEntryModeChanged,
-                              switchToInputEntryModeIcon: widget.switchToInputEntryModeIcon,
-                              switchToTimerEntryModeIcon: widget.switchToTimerEntryModeIcon,
-                            ),
-                          );
-                          if (_entryMode.value != DurationPickerEntryMode.input &&
-                              _entryMode.value != DurationPickerEntryMode.inputOnly) {
-                            return Flexible(child: child);
-                          }
-                          return child;
-                        },
-                      ),
-                      actions,
-                    ],
-                  ),
+    return Padding(
+      padding: pickerTheme.padding ?? defaultTheme.padding,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final Size constrainedSize = constraints.constrain(dialogSize);
+          final Size allowedSize = Size(
+            constrainedSize.width < minDialogSize.width
+                ? minDialogSize.width
+                : constrainedSize.width,
+            constrainedSize.height < minDialogSize.height
+                ? minDialogSize.height
+                : constrainedSize.height,
+          );
+          return SingleChildScrollView(
+            restorationId: 'time_picker_scroll_view_horizontal',
+            scrollDirection: Axis.horizontal,
+            physics: widget.scrollPhysics,
+            child: SingleChildScrollView(
+              restorationId: 'time_picker_scroll_view_vertical',
+              physics: widget.scrollPhysics,
+              child: AnimatedContainer(
+                width: allowedSize.width,
+                duration: _kDialogSizeAnimationDuration,
+                curve: Curves.easeIn,
+                constraints: BoxConstraints(
+                  minHeight: _kTimePickerInputMinimumHeight,
+                  maxHeight: allowedSize.height,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Builder(
+                      builder: (BuildContext context) {
+                        final Widget child = Form(
+                          key: _formKey,
+                          autovalidateMode: _autovalidateMode.value,
+                          child: _TimePicker(
+                            time: widget.initialDuration ?? Duration.zero,
+                            onTimeChanged: _handleTimeChanged,
+                            helpText: widget.helpText,
+                            cancelText: widget.textButtons?.cancelText,
+                            confirmText: widget.textButtons?.confirmText,
+                            errorInvalidText: widget.errorInvalidText,
+                            hourLabelText: widget.hourLabelText,
+                            minuteLabelText: widget.minuteLabelText,
+                            secondLabelText: widget.secondLabelText,
+                            restorationId: 'time_picker',
+                            entryMode: _entryMode.value,
+                            durationPickerMode: widget.durationPickerMode,
+                            orientation: widget.orientation,
+                            onEntryModeChanged: _handleEntryModeChanged,
+                            switchToInputEntryModeIcon: widget.switchToInputEntryModeIcon,
+                            switchToTimerEntryModeIcon: widget.switchToTimerEntryModeIcon,
+                          ),
+                        );
+                        if (_entryMode.value != DurationPickerEntryMode.input &&
+                            _entryMode.value != DurationPickerEntryMode.inputOnly) {
+                          return Flexible(child: child);
+                        }
+                        return child;
+                      },
+                    ),
+                    actions,
+                  ],
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
