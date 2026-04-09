@@ -2749,7 +2749,7 @@ class _DurationPickerWidgetState extends State<DurationPickerWidget> with Restor
   );
 
   // Base sizes
-  static const Size _kTimePickerPortraitSize = Size(310, 468);
+  static const Size _kTimePickerPortraitSize = Size(310, 400);
   static const Size _kTimePickerLandscapeSize = Size(524, 342);
   static const Size _kTimePickerLandscapeSizeM2 = Size(508, 300);
   static const Size _kTimePickerInputSize = Size(312, 252);
@@ -3002,8 +3002,10 @@ class _DurationPickerWidgetState extends State<DurationPickerWidget> with Restor
       // _dialogSize returns "padded" sizes.
       MaterialTapTargetSize.shrinkWrap => const Offset(0, -12),
     };
-    final Size dialogSize =
-        _dialogSize(context, useMaterial3: theme.useMaterial3) + tapTargetSizeOffset;
+    final Size dialogSize = _dialogSize(
+      context,
+      useMaterial3: theme.useMaterial3,
+    );
     final Size minDialogSize =
         _minDialogSize(context, useMaterial3: theme.useMaterial3) + tapTargetSizeOffset;
     return Padding(
