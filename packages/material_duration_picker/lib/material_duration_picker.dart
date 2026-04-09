@@ -2295,6 +2295,7 @@ class DurationPickerWidget extends StatefulWidget {
     this.contentPadding,
     this.showTitle = false,
     this.backgroundColor,
+    this.onDurationChanged,
   });
 
   /// The time initially selected when the dialog is shown.
@@ -2370,6 +2371,9 @@ class DurationPickerWidget extends StatefulWidget {
   final bool showTitle;
 
   final Color? backgroundColor;
+
+  /// Callback called when the selected duration is changed.
+  final ValueChanged<Duration>? onDurationChanged;
 
   @override
   State<DurationPickerWidget> createState() => _DurationPickerWidgetState();
@@ -2786,6 +2790,7 @@ class _DurationPickerWidgetState extends State<DurationPickerWidget> with Restor
       setState(() {
         _selectedDuration.value = value;
       });
+      widget.onDurationChanged?.call(value);
     }
   }
 
