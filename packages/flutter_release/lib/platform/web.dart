@@ -17,9 +17,9 @@ class WebPlatformBuild extends PlatformBuild {
 
   /// Build the artifact for Web. It creates a .tar.gz archive.
   @override
-  Future<String> build() async {
+  Future<String?> build() async {
     var filePath = await flutterBuild.build(buildCmd: 'web');
-    filePath ??= 'build/web';
+    if (filePath == null) return null;
     final pathSegments = filePath.split('/');
 
     final artifactPath =
@@ -55,6 +55,11 @@ class WebServerDistributor extends PublishDistributor {
   Future<void> publish() async {
     _logger.info('Build application...');
     final outputPath = await platformBuild.build();
+    if (outputPath == null) {
+      _logger.severe('Failed to build the app for Web!');
+      return;
+    }
+
     _logger.info('Build artifact path: $outputPath');
     final outputFile = File(outputPath);
 

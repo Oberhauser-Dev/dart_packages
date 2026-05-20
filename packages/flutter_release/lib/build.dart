@@ -173,5 +173,5 @@ abstract class PlatformBuild {
 
   /// Release the app for the given platform release type.
   /// Returns the absolute output path.
-  Future<String> build();
+  Future<String?> build();
 }

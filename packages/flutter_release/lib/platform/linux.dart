@@ -15,7 +15,7 @@ class LinuxPlatformBuild extends PlatformBuild {
 
   /// Build the artifact for Linux.
   @override
-  Future<String> build() async {
+  Future<String?> build() async {
     final cpuArchitecture = getCpuArchitecture();
 
     return switch (buildType) {
@@ -27,7 +27,7 @@ class LinuxPlatformBuild extends PlatformBuild {
   }
 
   /// Build the artifact for Linux. It creates a .tar.gz archive.
-  Future<String> _buildLinux({required CpuArchitecture arch}) async {
+  Future<String?> _buildLinux({required CpuArchitecture arch}) async {
     if (flutterBuild.installDeps) {
       await ensureInstalled('clang');
       await ensureInstalled('cmake');
@@ -38,23 +38,21 @@ class LinuxPlatformBuild extends PlatformBuild {
     }
 
     var filePath = await flutterBuild.build(buildCmd: 'linux');
-    if (filePath != null) {
-      filePath = path.dirname(filePath);
-    }
+    if (filePath == null) return null;
+    filePath = path.dirname(filePath);
 
     final artifactPath = flutterBuild.getArtifactPath(
       platform: 'linux',
       arch: arch,
       extension: 'tar.gz',
     );
-    final flutterArch = getFlutterCpuArchitecture(arch);
     await runProcess(
       'tar',
       [
         '-czf',
         artifactPath,
         '-C',
-        filePath ?? 'build/linux/$flutterArch/release/bundle',
+        filePath,
         '.', // Cannot use asterisk with `-C` option, as it's evaluated by shell
       ],
     );

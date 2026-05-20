@@ -223,7 +223,7 @@ class IosPlatformBuild extends PlatformBuild {
   });
 
   /// Build the artifact of iOS files. It creates an archive bundle.
-  Future<String> _buildIosApp() async {
+  Future<String?> _buildIosApp() async {
     // TODO: Signing without App Store not feasible at the moment
     final filePath = await flutterBuild.build(buildCmd: 'ios');
 
@@ -245,7 +245,7 @@ class IosPlatformBuild extends PlatformBuild {
   }
 
   /// Build the artifact for iOS App Store. It creates a .ipa bundle.
-  Future<String> _buildIosIpa() async {
+  Future<String?> _buildIosIpa() async {
     // Ipa build will fail resolving the provisioning profile, this is done later by fastlane.
     // ignore: unused_local_variable
     final filePath = await flutterBuild.build(buildCmd: 'ipa');
@@ -256,12 +256,12 @@ class IosPlatformBuild extends PlatformBuild {
 
     final iosDir = Directory('build/ios/ipa');
     if (!await iosDir.exists()) {
-      return '';
+      return null;
     }
     final entities = await iosDir.list().toList();
     FileSystemEntity? ipaEntity = _getLatestFileByExtension(entities, '.ipa');
     if (ipaEntity == null) {
-      return '';
+      return null;
     }
     artifactPath =
         flutterBuild.getArtifactPath(platform: 'ios', extension: 'ipa');
@@ -271,7 +271,7 @@ class IosPlatformBuild extends PlatformBuild {
 
   /// Build the artifact for iOS. Not supported as it requires signing.
   @override
-  Future<String> build() async {
+  Future<String?> build() async {
     final buildMetadata =
         flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
     if (int.tryParse(buildMetadata) == null) {
@@ -613,7 +613,7 @@ team_id("$teamId")
     final outputPath = await platformBuild.build();
     File? outputFile;
 
-    if (outputPath.isEmpty) {
+    if (outputPath == null) {
       _logger.warning('Build via flutter command finished failed silently. '
           'This can happen using manual signing with provisioning profiles.\n'
           'Therefore the app is now build again with fastlane. '
