@@ -5,7 +5,7 @@ import 'package:flutter_release/build.dart';
 
 /// Build the app for MacOS.
 class MacOsPlatformBuild extends PlatformBuild {
-  MacOsPlatformBuild({
+  const MacOsPlatformBuild({
     required super.buildType,
     required super.flutterBuild,
   });

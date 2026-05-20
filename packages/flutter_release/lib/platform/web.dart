@@ -10,7 +10,7 @@ final _logger = Logger('Web');
 
 /// Build the app for Web.
 class WebPlatformBuild extends PlatformBuild {
-  WebPlatformBuild({
+  const WebPlatformBuild({
     required super.buildType,
     required super.flutterBuild,
   });
@@ -39,7 +39,7 @@ class WebPlatformBuild extends PlatformBuild {
 }
 
 /// Distribute your app on a web server.
-class WebServerDistributor extends PublishDistributor {
+class WebServerDistributor extends PublishDistributor<WebPlatformBuild> {
   final tmpFolder = '/tmp/flutter_release/build';
   final WebServerConnection serverConnection;
   final String webServerPath;

@@ -35,10 +35,10 @@ enum PublishDistributorType {
 }
 
 /// A distributor, where you can publish your app, such as an app store.
-abstract class PublishDistributor {
+abstract class PublishDistributor<T extends PlatformBuild> {
   final PublishDistributorType distributorType;
 
-  final PlatformBuild platformBuild;
+  final T platformBuild;
 
   final FlutterPublish flutterPublish;
 

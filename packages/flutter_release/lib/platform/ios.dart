@@ -217,13 +217,13 @@ flutter_release publish ios-app-store \
 
 /// Build the app for iOS.
 class IosPlatformBuild extends PlatformBuild {
-  IosPlatformBuild({
+  const IosPlatformBuild({
     required super.buildType,
     required super.flutterBuild,
   });
 
   /// Build the artifact of iOS files. It creates an archive bundle.
-  Future<String?> _buildIosApp() async {
+  static Future<String?> _buildIosApp(FlutterBuild flutterBuild) async {
     // TODO: Signing without App Store not feasible at the moment
     final filePath = await flutterBuild.build(buildCmd: 'ios');
 
@@ -245,7 +245,7 @@ class IosPlatformBuild extends PlatformBuild {
   }
 
   /// Build the artifact for iOS App Store. It creates a .ipa bundle.
-  Future<String?> _buildIosIpa() async {
+  static Future<String?> _buildIosIpa(FlutterBuild flutterBuild) async {
     // Ipa build will fail resolving the provisioning profile, this is done later by fastlane.
     // ignore: unused_local_variable
     final filePath = await flutterBuild.build(buildCmd: 'ipa');
@@ -272,6 +272,7 @@ class IosPlatformBuild extends PlatformBuild {
   /// Build the artifact for iOS. Not supported as it requires signing.
   @override
   Future<String?> build() async {
+    FlutterBuild flutterBuild = this.flutterBuild;
     final buildMetadata =
         flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
     if (int.tryParse(buildMetadata) == null) {
@@ -279,21 +280,31 @@ class IosPlatformBuild extends PlatformBuild {
         _logger.warning(
             'Non integer values for build metadata are not supported on iOS. Omitting "$buildMetadata".');
       }
-      flutterBuild.buildVersion =
-          flutterBuild.buildVersion.copyWith(build: null);
+      flutterBuild = flutterBuild.copyWith(
+          buildVersion: flutterBuild.buildVersion.copyWith(build: null));
     }
 
     return switch (buildType) {
-      BuildType.ios => _buildIosApp(),
-      BuildType.ipa => _buildIosIpa(),
+      BuildType.ios => _buildIosApp(flutterBuild),
+      BuildType.ipa => _buildIosIpa(flutterBuild),
       _ => throw UnsupportedError(
           'BuildType $buildType is not available for iOS!'),
     };
   }
+
+  IosPlatformBuild copyWith({
+    BuildType? buildType,
+    FlutterBuild? flutterBuild,
+  }) {
+    return IosPlatformBuild(
+      buildType: buildType ?? this.buildType,
+      flutterBuild: flutterBuild ?? this.flutterBuild,
+    );
+  }
 }
 
 /// Distribute your app on the iOS App store.
-class IosAppStoreDistributor extends PublishDistributor {
+class IosAppStoreDistributor extends PublishDistributor<IosPlatformBuild> {
   static final _iosDirectory = 'ios';
   static final _fastlaneDirectory = '$_iosDirectory/fastlane';
 
@@ -572,13 +583,16 @@ team_id("$teamId")
       workingDirectory: _iosDirectory,
     );
 
+    IosPlatformBuild platformBuild = this.platformBuild;
+
     if (!isProduction) {
       final buildVersion = platformBuild.flutterBuild.buildVersion;
       // Remove semver preRelease suffix
       // See: https://github.com/flutter/flutter/issues/27589
       if (buildVersion.isPreRelease) {
-        platformBuild.flutterBuild.buildVersion =
-            platformBuild.flutterBuild.buildVersion.copyWith(pre: null);
+        platformBuild = platformBuild.copyWith(
+            flutterBuild: platformBuild.flutterBuild
+                .copyWith(buildVersion: buildVersion.copyWith(pre: null)));
         _logger.info(
           'Build version was truncated from $buildVersion to '
           '${platformBuild.flutterBuild.buildVersion} as required by app store',
@@ -598,10 +612,11 @@ team_id("$teamId")
           'Use "$versionCode" as next version code (fetched from App Store Connect).',
         );
 
-        platformBuild.flutterBuild.buildVersion =
-            platformBuild.flutterBuild.buildVersion.copyWith(
+        platformBuild = platformBuild.copyWith(
+            flutterBuild: platformBuild.flutterBuild.copyWith(
+                buildVersion: platformBuild.flutterBuild.buildVersion.copyWith(
           build: versionCode.toString(),
-        );
+        )));
       }
     }
 
