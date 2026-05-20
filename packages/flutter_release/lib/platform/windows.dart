@@ -11,16 +11,11 @@ class WindowsPlatformBuild extends PlatformBuild {
 
   /// Build the artifact for Windows. It creates a .zip archive.
   @override
-  Future<String> build() async {
+  Future<String?> build() async {
     var filePath = await flutterBuild.build(buildCmd: 'windows');
     final cpuArchitecture = getCpuArchitecture();
-    final flutterArch = getFlutterCpuArchitecture(cpuArchitecture);
-
-    if (filePath != null) {
-      filePath = '${path.dirname(filePath)}\\*';
-    } else {
-      filePath = 'build\\windows\\$flutterArch\\runner\\Release\\*';
-    }
+    if (filePath == null) return null;
+    filePath = '${path.dirname(filePath)}\\*';
 
     final artifactPath = flutterBuild.getArtifactPath(
       platform: 'windows',

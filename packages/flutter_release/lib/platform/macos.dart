@@ -12,7 +12,7 @@ class MacOsPlatformBuild extends PlatformBuild {
 
   /// Build the artifact for macOS. It creates a .zip archive.
   @override
-  Future<String> build() async {
+  Future<String?> build() async {
     var filePath = await flutterBuild.build(buildCmd: 'macos');
     if (filePath == null) {
       // The App's build file/folder name (*.app) is not equal to [appName], so must read the actual file name.

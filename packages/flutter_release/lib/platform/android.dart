@@ -30,31 +30,31 @@ class AndroidPlatformBuild extends PlatformBuild {
   }) : keyPassword = keyPassword ?? keyStorePassword;
 
   /// Build the artifact for Android. It creates a .apk installer.
-  Future<String> _buildAndroidApk() async {
+  Future<String?> _buildAndroidApk() async {
     final filePath = await flutterBuild.build(buildCmd: 'apk');
 
     final artifactPath =
         flutterBuild.getArtifactPath(platform: 'android', extension: 'apk');
-    final file =
-        File(filePath ?? 'build/app/outputs/flutter-apk/app-release.apk');
+    if (filePath == null) return null;
+    final file = File(filePath);
     await file.rename(artifactPath);
     return artifactPath;
   }
 
   /// Build the artifact for Android. It creates a .aab installer.
-  Future<String> _buildAndroidAab() async {
+  Future<String?> _buildAndroidAab() async {
     final filePath = await flutterBuild.build(buildCmd: 'appbundle');
 
     final artifactPath =
         flutterBuild.getArtifactPath(platform: 'android', extension: 'aab');
-    final file =
-        File(filePath ?? 'build/app/outputs/bundle/release/app-release.aab');
+    if (filePath == null) return null;
+    final file = File(filePath);
     await file.rename(artifactPath);
     return artifactPath;
   }
 
   @override
-  Future<String> build() async {
+  Future<String?> build() async {
     if (keyStoreFileBase64 != null &&
         keyStorePassword != null &&
         keyAlias != null &&
@@ -213,6 +213,11 @@ package_name("$packageName")
     _logger.info('Build application...');
 
     final outputPath = await platformBuild.build();
+    if (outputPath == null) {
+      _logger.severe('Failed to build the app for Android!');
+      return;
+    }
+
     _logger.info('Build artifact path: $outputPath');
     final outputFile = File(outputPath);
 
