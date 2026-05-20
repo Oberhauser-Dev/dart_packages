@@ -21,7 +21,7 @@ class AndroidPlatformBuild extends PlatformBuild {
   final String? keyAlias;
   final String? keyPassword;
 
-  AndroidPlatformBuild({
+  const AndroidPlatformBuild({
     required super.buildType,
     required super.flutterBuild,
     this.keyStoreFileBase64,
@@ -31,7 +31,7 @@ class AndroidPlatformBuild extends PlatformBuild {
   }) : keyPassword = keyPassword ?? keyStorePassword;
 
   /// Build the artifact for Android. It creates a .apk installer.
-  Future<String?> _buildAndroidApk() async {
+  static Future<String?> _buildAndroidApk(FlutterBuild flutterBuild) async {
     final filePath = await flutterBuild.build(buildCmd: 'apk');
 
     final artifactPath =
@@ -43,7 +43,7 @@ class AndroidPlatformBuild extends PlatformBuild {
   }
 
   /// Build the artifact for Android. It creates a .aab installer.
-  Future<String?> _buildAndroidAab() async {
+  static Future<String?> _buildAndroidAab(FlutterBuild flutterBuild) async {
     final filePath = await flutterBuild.build(buildCmd: 'appbundle');
 
     final artifactPath =
@@ -96,6 +96,7 @@ storeFile=${keyStoreFile.absolute.path}
       _logger.fine('Skip signing.');
     }
 
+    FlutterBuild flutterBuild = this.flutterBuild;
     final buildMetadata =
         flutterBuild.buildVersion.build.map((b) => b.toString()).join('.');
     if (int.tryParse(buildMetadata) == null) {
@@ -103,13 +104,13 @@ storeFile=${keyStoreFile.absolute.path}
         _logger.warning(
             'Non integer values for build metadata are not supported on Android. Omitting "$buildMetadata".');
       }
-      flutterBuild.buildVersion =
-          flutterBuild.buildVersion.copyWith(build: null);
+      flutterBuild = flutterBuild.copyWith(
+          buildVersion: flutterBuild.buildVersion.copyWith(build: null));
     }
 
     return switch (buildType) {
-      BuildType.aab => _buildAndroidAab(),
-      BuildType.apk => _buildAndroidApk(),
+      BuildType.aab => _buildAndroidAab(flutterBuild),
+      BuildType.apk => _buildAndroidApk(flutterBuild),
       _ => throw UnsupportedError(
           'BuildType $buildType is not available for Android!'),
     };
@@ -135,7 +136,8 @@ storeFile=${keyStoreFile.absolute.path}
 }
 
 /// Distribute your app on the Google Play store.
-class AndroidGooglePlayDistributor extends PublishDistributor {
+class AndroidGooglePlayDistributor
+    extends PublishDistributor<AndroidPlatformBuild> {
   static final _androidDirectory = 'android';
   static final _fastlaneDirectory = '$_androidDirectory/fastlane';
   static final _fastlaneSecretsJsonFile = 'fastlane-secrets.json';
@@ -152,6 +154,8 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
 
   @override
   Future<void> publish() async {
+    AndroidPlatformBuild platformBuild = this.platformBuild;
+
     _logger.info('Install dependencies...');
     if (!await isInstalled('fastlane')) {
       await ensureInstalled('ruby');
@@ -168,18 +172,15 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
     );
 
     /// Prepare gradlew executable:
-    if (platformBuild is AndroidPlatformBuild) {
-      final configPlatformBuild =
-          (platformBuild as AndroidPlatformBuild).copyWith(
-        // Only apk supports `config-only` flag
-        buildType: BuildType.apk,
-        flutterBuild: platformBuild.flutterBuild.copyWith(buildArgs: [
-          ...platformBuild.flutterBuild.buildArgs,
-          '--config-only'
-        ]),
-      );
-      await configPlatformBuild.build();
-    }
+    final configPlatformBuild = platformBuild.copyWith(
+      // Only apk supports `config-only` flag
+      buildType: BuildType.apk,
+      flutterBuild: platformBuild.flutterBuild.copyWith(buildArgs: [
+        ...platformBuild.flutterBuild.buildArgs,
+        '--config-only'
+      ]),
+    );
+    await configPlatformBuild.build();
 
     final getApplicationIdScript =
         await getPackageFileUri('gradle/get_android_app_id.gradle');
@@ -244,10 +245,11 @@ package_name("$packageName")
           'Use "$versionCode" as next version code (fetched from Google Play).',
         );
 
-        platformBuild.flutterBuild.buildVersion =
-            platformBuild.flutterBuild.buildVersion.copyWith(
+        platformBuild = platformBuild.copyWith(
+            flutterBuild: platformBuild.flutterBuild.copyWith(
+                buildVersion: platformBuild.flutterBuild.buildVersion.copyWith(
           build: versionCode.toString(),
-        );
+        )));
       }
     }
 

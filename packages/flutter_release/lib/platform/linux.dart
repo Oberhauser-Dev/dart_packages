@@ -8,7 +8,7 @@ import 'package:path/path.dart' as path;
 
 /// Build the app for Linux.
 class LinuxPlatformBuild extends PlatformBuild {
-  LinuxPlatformBuild({
+  const LinuxPlatformBuild({
     required super.buildType,
     required super.flutterBuild,
   });

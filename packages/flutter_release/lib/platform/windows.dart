@@ -4,7 +4,7 @@ import 'package:path/path.dart' as path;
 
 /// Build the app for Windows.
 class WindowsPlatformBuild extends PlatformBuild {
-  WindowsPlatformBuild({
+  const WindowsPlatformBuild({
     required super.buildType,
     required super.flutterBuild,
   });

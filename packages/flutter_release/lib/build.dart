@@ -13,7 +13,7 @@ final _logger = Logger('FlutterBuild');
 class FlutterBuild {
   final String appName;
   final String appVersion;
-  Version buildVersion;
+  final Version buildVersion;
   List<String> buildArgs;
   final String? mainPath;
   final String? flavor;
@@ -206,7 +206,7 @@ abstract class PlatformBuild {
   final BuildType buildType;
   final FlutterBuild flutterBuild;
 
-  PlatformBuild({
+  const PlatformBuild({
     required this.buildType,
     required this.flutterBuild,
   });
