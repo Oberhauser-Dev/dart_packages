@@ -81,7 +81,7 @@ abstract class CommonPublishCommand extends Command {
       stage: stageStr == null ? null : PublishStage.values.byName(stageStr),
     );
 
-    final flutterBuild = FlutterBuild(
+    final flutterBuild = FlutterBuild.parse(
       appName: results[argAppName] as String?,
       appVersion: results[argAppVersion] as String?,
       buildVersion: results[argBuildVersion] as String?,

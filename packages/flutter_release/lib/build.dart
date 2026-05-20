@@ -11,9 +11,9 @@ final _logger = Logger('FlutterBuild');
 /// Class which holds the necessary attributes to perform a build on various
 /// platforms for the specified [buildType].
 class FlutterBuild {
-  late final String appName;
-  late final String appVersion;
-  late Version buildVersion;
+  final String appName;
+  final String appVersion;
+  Version buildVersion;
   List<String> buildArgs;
   final String? mainPath;
   final String? flavor;
@@ -21,24 +21,37 @@ class FlutterBuild {
   final bool installDeps;
   final String flutterSdkPath;
 
-  FlutterBuild({
+  FlutterBuild._({
+    required this.appName,
+    required this.appVersion,
+    required this.buildVersion,
+    this.buildArgs = const [],
+    this.mainPath,
+    this.flavor,
+    this.installDeps = true,
+    required this.releaseFolder,
+    required this.flutterSdkPath,
+  });
+
+  factory FlutterBuild.parse({
     String? appName,
     String? appVersion,
     String? buildVersion,
     String? buildPreRelease,
     String? buildMetadata,
-    this.mainPath,
-    this.flavor,
-    this.buildArgs = const [],
-    this.installDeps = true,
+    String? mainPath,
+    String? flavor,
+    List<String> buildArgs = const [],
+    bool installDeps = true,
     String? releaseFolder,
     String? flutterSdkPath,
-  })  : flutterSdkPath = flutterSdkPath ?? 'flutter',
-        releaseFolder = releaseFolder ?? 'build/releases' {
+  }) {
+    flutterSdkPath ??= 'flutter';
+    releaseFolder ??= 'build/releases';
     final pubspecStr = File('pubspec.yaml').readAsStringSync();
     final pubspec = Pubspec.parse(pubspecStr);
 
-    this.buildVersion = resolveVersion(
+    final parsedBuildVersion = resolveVersion(
       pubspecVersion: pubspec.version,
       appVersion: appVersion,
       buildVersion: buildVersion,
@@ -46,17 +59,20 @@ class FlutterBuild {
       buildMetadata: buildMetadata,
     );
 
-    if (appVersion != null) {
-      this.appVersion = appVersion;
-    } else {
-      this.appVersion = 'v${this.buildVersion.canonicalizedVersion}';
-    }
+    appVersion ??= 'v${parsedBuildVersion.canonicalizedVersion}';
+    appName ??= pubspec.name;
 
-    if (appName == null) {
-      this.appName = pubspec.name;
-    } else {
-      this.appName = appName;
-    }
+    return FlutterBuild._(
+      appName: appName,
+      appVersion: appVersion,
+      buildVersion: parsedBuildVersion,
+      releaseFolder: releaseFolder,
+      flutterSdkPath: flutterSdkPath,
+      buildArgs: buildArgs,
+      flavor: flavor,
+      installDeps: installDeps,
+      mainPath: mainPath,
+    );
   }
 
   /// Build the flutter binaries for the platform given in [buildCmd].
@@ -128,6 +144,30 @@ class FlutterBuild {
     CpuArchitecture? arch,
   }) {
     return '$releaseFolder/$appName-$appVersion-$platform${arch != null ? '-${arch.name}' : ''}.$extension';
+  }
+
+  FlutterBuild copyWith({
+    String? appName,
+    String? appVersion,
+    Version? buildVersion,
+    List<String>? buildArgs,
+    String? mainPath,
+    String? flavor,
+    String? releaseFolder,
+    bool? installDeps,
+    String? flutterSdkPath,
+  }) {
+    return FlutterBuild._(
+      appName: appName ?? this.appName,
+      appVersion: appVersion ?? this.appVersion,
+      buildVersion: buildVersion ?? this.buildVersion,
+      buildArgs: buildArgs ?? this.buildArgs,
+      mainPath: mainPath ?? this.mainPath,
+      flavor: flavor ?? this.flavor,
+      releaseFolder: releaseFolder ?? this.releaseFolder,
+      installDeps: installDeps ?? this.installDeps,
+      flutterSdkPath: flutterSdkPath ?? this.flutterSdkPath,
+    );
   }
 }
 

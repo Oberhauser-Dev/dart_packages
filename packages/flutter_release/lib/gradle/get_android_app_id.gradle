@@ -1,0 +1,23 @@
+// Example usage: cd android && ./gradlew -q --init-script get_android_app_id.gradle :app:printApplicationId [-Pflavor=<name>]
+
+allprojects {
+    afterEvaluate {
+        tasks.register("printApplicationId") {
+            doLast {
+                def flavor = project.findProperty("flavor")
+                if (!flavor) {
+                    println android.defaultConfig.applicationId
+                    return
+                }
+                def pf = android.productFlavors.find { it.name == flavor }
+                if (!pf) {
+                    def available = android.productFlavors.collect { it.name }.join(", ")
+                    throw new GradleException(
+                        "Flavor '${flavor}' not found. Available: ${available}"
+                    )
+                }
+                println pf.applicationId
+            }
+        }
+    }
+}
