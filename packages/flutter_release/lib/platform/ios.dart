@@ -618,6 +618,10 @@ team_id("$teamId")
           build: versionCode.toString(),
         )));
       }
+    } else {
+      _logger.info(
+        'Using provided version code "${platformBuild.flutterBuild.buildVersion.build}".',
+      );
     }
 
     _logger.info('Build application...');
