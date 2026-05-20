@@ -66,7 +66,7 @@ abstract class CommonBuildCommand extends Command {
   FutureOr? run() async {
     final results = argResults;
     if (results == null) throw ArgumentError('No arguments provided');
-    final flutterBuild = FlutterBuild(
+    final flutterBuild = FlutterBuild.parse(
       appName: results[argAppName] as String?,
       appVersion: results[argAppVersion] as String?,
       buildVersion: results[argBuildVersion] as String?,

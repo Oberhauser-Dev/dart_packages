@@ -5,7 +5,8 @@ import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
 import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
-import 'package:flutter_release/tool_installation.dart';
+import 'package:flutter_release/util/package_util.dart';
+import 'package:flutter_release/util/tool_installation.dart';
 import 'package:logging/logging.dart';
 
 final _logger = Logger('Android');
@@ -113,6 +114,24 @@ storeFile=${keyStoreFile.absolute.path}
           'BuildType $buildType is not available for Android!'),
     };
   }
+
+  AndroidPlatformBuild copyWith({
+    BuildType? buildType,
+    FlutterBuild? flutterBuild,
+    String? keyStoreFileBase64,
+    String? keyStorePassword,
+    String? keyAlias,
+    String? keyPassword,
+  }) {
+    return AndroidPlatformBuild(
+      buildType: buildType ?? this.buildType,
+      flutterBuild: flutterBuild ?? this.flutterBuild,
+      keyStoreFileBase64: keyStoreFileBase64 ?? this.keyStoreFileBase64,
+      keyStorePassword: keyStorePassword ?? this.keyStorePassword,
+      keyAlias: keyAlias ?? this.keyAlias,
+      keyPassword: keyPassword ?? this.keyPassword,
+    );
+  }
 }
 
 /// Distribute your app on the Google Play store.
@@ -148,31 +167,53 @@ class AndroidGooglePlayDistributor extends PublishDistributor {
       installCommands: ['sudo', 'gem', 'install'],
     );
 
+    /// Prepare gradlew executable:
+    if (platformBuild is AndroidPlatformBuild) {
+      final configPlatformBuild =
+          (platformBuild as AndroidPlatformBuild).copyWith(
+        // Only apk supports `config-only` flag
+        buildType: BuildType.apk,
+        flutterBuild: platformBuild.flutterBuild.copyWith(buildArgs: [
+          ...platformBuild.flutterBuild.buildArgs,
+          '--config-only'
+        ]),
+      );
+      await configPlatformBuild.build();
+    }
+
+    final getApplicationIdScript =
+        await getPackageFileUri('gradle/get_android_app_id.gradle');
+    // On Unix the executable path must be marked relative!
+    final gradlew = Platform.isWindows ? 'gradlew.bat' : './gradlew';
+    final result = await runProcess(
+      gradlew,
+      [
+        '-q',
+        '--init-script',
+        getApplicationIdScript!.path,
+        ':app:printApplicationId',
+        if (platformBuild.flutterBuild.flavor != null)
+          '-Pflavor=${platformBuild.flutterBuild.flavor}',
+      ],
+      workingDirectory: _androidDirectory,
+      printCall: true,
+    );
+
+    final packageName = result.stdout.toString().trim();
+    if (packageName.isEmpty) throw Exception('Application Id not found');
+    _logger.info('Used Application Id: $packageName');
+
     // Save Google play store credentials file
     final fastlaneSecretsJsonFile =
         File('$_androidDirectory/$_fastlaneSecretsJsonFile');
     await fastlaneSecretsJsonFile
         .writeAsBytes(base64.decode(fastlaneSecretsJsonBase64));
 
-    await installFastlanePlugin('get_application_id_flavor',
-        workingDirectory: _androidDirectory);
-
-    final packageName = await runFastlaneProcess(
-      [
-        'run',
-        'get_application_id_flavor',
-        if (platformBuild.flutterBuild.flavor != null)
-          'flavor:${platformBuild.flutterBuild.flavor}',
-      ],
-      printCall: true,
-      workingDirectory: _androidDirectory,
-    );
-    if (packageName == null) throw Exception('Application Id not found');
-
     final fastlaneAppfile = '''
 json_key_file("${fastlaneSecretsJsonFile.absolute.path}")
 package_name("$packageName")
     ''';
+    await Directory(_fastlaneDirectory).create(recursive: true);
     await File('$_fastlaneDirectory/Appfile').writeAsString(fastlaneAppfile);
 
     // Check if play store credentials are valid

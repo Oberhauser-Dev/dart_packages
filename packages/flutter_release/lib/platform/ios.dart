@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:dart_release/utils.dart';
 import 'package:flutter_release/build.dart';
 import 'package:flutter_release/fastlane/fastlane.dart';
 import 'package:flutter_release/publish.dart';
-import 'package:flutter_release/tool_installation.dart';
+import 'package:flutter_release/util/package_util.dart';
+import 'package:flutter_release/util/tool_installation.dart';
 import 'package:logging/logging.dart';
 
 const apiKeyJsonFileName = 'ApiAuth.json';
@@ -523,10 +523,8 @@ team_id("$teamId")
         // Update provisioning profile
         // Need to get the target (product) name of the bundle ids in order to update the provisioning profiles.
         // As there's no easy way to do this in fastlane, a script handles this.
-        final getBundleIdFromProductRubyUri = Uri.parse(
-            'package:flutter_release/fastlane/get_bundle_id_product.rb');
         final getBundleIdFromProductRubyFile =
-            await Isolate.resolvePackageUri(getBundleIdFromProductRubyUri);
+            await getPackageFileUri('fastlane/get_bundle_id_product.rb');
         var result = await runProcess(
           'ruby',
           [
