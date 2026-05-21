@@ -1,3 +1,10 @@
+## 0.3.6
+
+ - **FIX**: Make fastlane result more resilient against verbose output. ([babab9ed](https://github.com/Oberhauser-Dev/dart_packages/commit/babab9ed6d74e2ea48839c6e8534f53c966735b8))
+ - **FIX**: Disallow overwriting internal build properties. ([2d38fdf2](https://github.com/Oberhauser-Dev/dart_packages/commit/2d38fdf2de2023c81c335c5ff682b58bb34bd4fa))
+ - **FIX**(android): Replace fastlane get_application_id_flavor with gradle script. ([84503630](https://github.com/Oberhauser-Dev/dart_packages/commit/84503630a8d2fe932a84dbd4b030be84f2e92fcb))
+ - **FEAT**: Allow nullable build output. ([eb61a7c9](https://github.com/Oberhauser-Dev/dart_packages/commit/eb61a7c91977153e54633f3db9c9aaed86d09cc3))
+
 ## 0.3.5+2
 
  - **FIX**(ios): Support building IPA directly. ([b68ea8d5](https://github.com/Oberhauser-Dev/dart_packages/commit/b68ea8d5fb9cd021a1b9640a783dee6e53b98da1))
