@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dart_release/utils/process.dart';
 
 String? parseFastlaneResult(String output) {
   const splitter = LineSplitter();
   final lines = splitter.convert(output);
   final resultSearchStr = 'Result:';
-  final indexOfResult = lines.last.indexOf(resultSearchStr);
+  final resultLine =
+      lines.lastWhereOrNull((line) => line.contains(resultSearchStr));
+  if (resultLine == null) return null;
+  final indexOfResult = resultLine.indexOf(resultSearchStr);
   if (indexOfResult < 0) return null;
-  return lines.last.substring(indexOfResult + resultSearchStr.length).trim();
+  return resultLine.substring(indexOfResult + resultSearchStr.length).trim();
 }
 
 Future<String?> runFastlaneProcess(
@@ -29,6 +33,9 @@ Future<String?> runFastlaneProcess(
   environment['FASTLANE_DISABLE_OUTPUT_FORMAT'] = '1';
   environment['FASTLANE_HIDE_CHANGELOG'] = '1';
   environment['FASTLANE_SKIP_ACTION_SUMMARY'] = '1';
+  environment['FASTLANE_HIDE_TIMESTAMP'] = '1';
+  environment['SKIP_SLOW_FASTLANE_WARNING'] = '1';
+  environment['FASTLANE_HIDE_PLUGINS_TABLE'] = '1';
   final result = await runProcess(
     'fastlane',
     arguments,
