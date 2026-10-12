@@ -1,3 +1,7 @@
+## 0.3.6+1
+
+ - **FIX**: Ignore unrelated dump on Gradle printApplicationId task ([#61](https://github.com/Oberhauser-Dev/dart_packages/issues/61)). ([9547dacf](https://github.com/Oberhauser-Dev/dart_packages/commit/9547dacfec575af15a334a07b38c1a0712137ff1))
+
 ## 0.3.6
 
  - **FIX**: Make fastlane result more resilient against verbose output. ([babab9ed](https://github.com/Oberhauser-Dev/dart_packages/commit/babab9ed6d74e2ea48839c6e8534f53c966735b8))
