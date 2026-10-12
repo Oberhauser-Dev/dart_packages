@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-10-12
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flutter_release` - `v0.3.6+1`](#flutter_release---v0361)
+
+---
+
+#### `flutter_release` - `v0.3.6+1`
+
+ - **FIX**: Ignore unrelated dump on Gradle printApplicationId task ([#61](https://github.com/Oberhauser-Dev/dart_packages/issues/61)). ([9547dacf](https://github.com/Oberhauser-Dev/dart_packages/commit/9547dacfec575af15a334a07b38c1a0712137ff1))
+
+
 ## 2026-05-21
 
 ### Changes
