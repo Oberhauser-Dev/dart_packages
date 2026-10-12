@@ -200,8 +200,15 @@ class AndroidGooglePlayDistributor
       printCall: true,
     );
 
-    final packageName = result.stdout.toString().trim();
-    if (packageName.isEmpty) throw Exception('Application Id not found');
+    // Gradle may print unrelated output (e.g. NDK installation) to stdout,
+    // so only take the last line, which is printed by the task.
+    final packageName = const LineSplitter()
+        .convert(result.stdout.toString())
+        .map((line) => line.trim())
+        .lastWhere((line) => line.isNotEmpty, orElse: () => '');
+    if (packageName.isEmpty) {
+      throw Exception('Application Id not found in output:\n${result.stdout}');
+    }
     _logger.info('Used Application Id: $packageName');
 
     // Save Google play store credentials file
