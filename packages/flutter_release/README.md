@@ -52,7 +52,7 @@ Options:
 - `app-name`: The name of the app executable
 - `app-version`: Semantic version of the release (like `v1.2.3`), see https://semver.org/
 - `build-metadata`: Specify the build number (also used as version code for Android, but is handled automatically)
-- `build-type`: Release one of the following options: `apk`, `web`, `ipk`, `macos`, `windows`, `debian`
+- `build-type`: Release one of the following options: `apk`, `web`, `ipk`, `macos`, `windows`, `msix`, `debian`
 - `build-arg`: Add options such as `--dart-define` to the flutter build command
 
 Flags:
@@ -60,10 +60,10 @@ Flags:
 
 ## Supported Features
 
-| Platform    | Android |               | iOS             | web          | Windows           | macOS           | Linux   |          |
-|-------------|---------|---------------|-----------------|--------------|-------------------|-----------------|---------|----------|
-| **Build**   | apk ✓   | aab ✓         | ipa ❌           | web ✓        | windows ✓         | macos ✓         | linux ✓ | debian ✓ |
-| **Publish** |         | Google Play ✓ | iOS App Store ✓ | Web Server ✓ | Microsoft Store ❌ | Mac App Store ❌ | Snap ❌  | Ubuntu ❌ |
+| Platform    | Android |               | iOS             | web          | Windows           |        | macOS           | Linux   |          |
+|-------------|---------|---------------|-----------------|--------------|-------------------|--------|-----------------|---------|----------|
+| **Build**   | apk ✓   | aab ✓         | ipa ❌           | web ✓        | windows ✓         | msix ✓ | macos ✓         | linux ✓ | debian ✓ |
+| **Publish** |         | Google Play ✓ | iOS App Store ✓ | Web Server ✓ | Microsoft Store ❌ |        | Mac App Store ❌ | Snap ❌  | Ubuntu ❌ |
 
 Support for other app distributors is planned.
 
@@ -163,6 +163,28 @@ To create additional provisioning profiles, run in the `ios` directory:
 ```
 fastlane sigh -a com.example.ios.to.be.added --api_key_path ApiAuth.json
 ```
+
+### Windows - MSIX installer
+
+The MSIX installer is created via the [msix](https://pub.dev/packages/msix) package.
+Configure it in the `msix_config` section of your `pubspec.yaml`, e.g.:
+
+```yaml
+msix_config:
+  display_name: Example
+  publisher_display_name: Example Publisher
+  identity_name: com.example.example-app
+  logo_path: assets/images/logo.png
+```
+
+The version is derived from the app version (`a.b.c.0`), the architecture from the build machine.
+To sign the installer, pass your certificate:
+
+```shell
+flutter_release build msix  --certificate-file-base64=$(base64 --wrap=0 certificate.pfx)  --certificate-password=<mycertificatepassword>
+```
+
+Otherwise, the installer is signed with the test certificate of the msix package, which users have to trust manually.
 
 ### Web - Server (via Debian only)
 
