@@ -17,6 +17,10 @@ const argKeyAlias = 'key-alias';
 const argKeyPassword = 'key-password';
 const argFlutterSdkPath = 'flutter-sdk-path';
 
+// Build Windows MSIX
+const argCertificateFileBase64 = 'certificate-file-base64';
+const argCertificatePassword = 'certificate-password';
+
 class BuildCommand extends Command {
   @override
   final name = commandBuild;
@@ -29,6 +33,7 @@ class BuildCommand extends Command {
     addSubcommand(IosIpaBuildCommand());
     addSubcommand(IosAppBuildCommand());
     addSubcommand(WindowsBuildCommand());
+    addSubcommand(WindowsMsixBuildCommand());
     addSubcommand(LinuxBuildCommand());
     addSubcommand(DebianBuildCommand());
     addSubcommand(WebBuildCommand());
@@ -139,6 +144,35 @@ class WindowsBuildCommand extends CommonBuildCommand {
     return WindowsPlatformBuild(
       buildType: buildType,
       flutterBuild: flutterBuild,
+    );
+  }
+}
+
+class WindowsMsixBuildCommand extends CommonBuildCommand {
+  static void addWindowsMsixBuildArgs(ArgParser argParser) {
+    argParser
+      ..addOption(argCertificateFileBase64)
+      ..addOption(argCertificatePassword);
+  }
+
+  @override
+  final description = 'Build the app as Windows MSIX installer.';
+
+  @override
+  BuildType buildType = BuildType.msix;
+
+  WindowsMsixBuildCommand() {
+    addWindowsMsixBuildArgs(argParser);
+  }
+
+  @override
+  PlatformBuild getPlatformBuild(
+      ArgResults results, FlutterBuild flutterBuild) {
+    return WindowsPlatformBuild(
+      buildType: buildType,
+      flutterBuild: flutterBuild,
+      certificateFileBase64: results[argCertificateFileBase64] as String?,
+      certificatePassword: results[argCertificatePassword] as String?,
     );
   }
 }

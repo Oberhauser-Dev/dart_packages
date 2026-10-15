@@ -194,6 +194,9 @@ enum BuildType {
   /// Build binary for Windows.
   windows,
 
+  /// Build MSIX installer for Windows.
+  msix,
+
   /// Build binary for Linux.
   linux,
 
