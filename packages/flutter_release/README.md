@@ -172,8 +172,6 @@ Configure it in the `msix_config` section of your `pubspec.yaml`, e.g.:
 ```yaml
 msix_config:
   display_name: Example
-  publisher_display_name: Example Publisher
-  identity_name: com.example.example-app
   logo_path: assets/images/logo.png
 ```
 
@@ -187,6 +185,19 @@ flutter_release build msix `
 ```
 
 Otherwise, the installer is signed with the test certificate of the msix package, which users have to trust manually.
+
+For the Microsoft Store, build an unsigned installer with the `--store` flag, as the store signs it on submission.
+Take the identity name, the publisher and the publisher display name from the
+[Partner Center](https://partner.microsoft.com/dashboard) (*Product identity*) of your app:
+
+```powershell
+flutter_release build msix --store `
+  --identity-name=Example.ExampleApp `
+  --publisher="CN=00000000-0000-0000-0000-000000000000" `
+  --publisher-display-name="Example Publisher"
+```
+
+Alternatively, set them via `identity_name`, `publisher` and `publisher_display_name` in the `msix_config`.
 
 ### Web - Server (via Debian only)
 
