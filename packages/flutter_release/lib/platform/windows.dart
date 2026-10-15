@@ -17,11 +17,35 @@ class WindowsPlatformBuild extends PlatformBuild {
   /// The password of the certificate.
   final String? certificatePassword;
 
+  /// Whether to build the MSIX installer for the Microsoft Store.
+  ///
+  /// The installer is not signed, as the Microsoft Store signs it on submission.
+  final bool isStore;
+
+  /// The publisher of the MSIX installer (e.g. `CN=...`), overrides the `publisher` of the `msix_config`.
+  ///
+  /// Required for the Microsoft Store. When signing, it must match the subject of the certificate.
+  final String? publisher;
+
+  /// The identity name of the MSIX installer, overrides the `identity_name` of the `msix_config`.
+  ///
+  /// Required for the Microsoft Store.
+  final String? identityName;
+
+  /// The display name of the publisher, overrides the `publisher_display_name` of the `msix_config`.
+  ///
+  /// Required for the Microsoft Store.
+  final String? publisherDisplayName;
+
   const WindowsPlatformBuild({
     required super.buildType,
     required super.flutterBuild,
     this.certificateFileBase64,
     this.certificatePassword,
+    this.isStore = false,
+    this.publisher,
+    this.identityName,
+    this.publisherDisplayName,
   });
 
   /// Build the artifact for Windows.
@@ -67,18 +91,24 @@ class WindowsPlatformBuild extends PlatformBuild {
   ///
   /// The package is configured via `msix_config` in the `pubspec.yaml`, see https://pub.dev/packages/msix.
   /// Without a certificate, the installer is signed with the test certificate of the msix package.
+  /// For the Microsoft Store ([isStore]), the installer is not signed at all.
   Future<String?> _buildMsix({required CpuArchitecture arch}) async {
     final filePath = await flutterBuild.build(buildCmd: 'windows');
     if (filePath == null) return null;
 
     final artifactPath = flutterBuild.getArtifactPath(
-      platform: 'windows',
+      platform: isStore ? 'windows-store' : 'windows',
       arch: arch,
       extension: 'msix',
     );
 
     File? certificateFile;
-    if (certificateFileBase64 != null) {
+    if (isStore) {
+      if (certificateFileBase64 != null) {
+        _logger.warning(
+            'Ignore certificate, as the Microsoft Store signs the installer.');
+      }
+    } else if (certificateFileBase64 != null) {
       _logger.fine('Prepare signing certificate');
       final tempDir = await Directory.systemTemp.createTemp('flutter_release');
       certificateFile = File(path.join(tempDir.path, 'certificate.pfx'));
@@ -104,11 +134,18 @@ class WindowsPlatformBuild extends PlatformBuild {
         // Never modify the certificate store of the build machine.
         '--install-certificate',
         'false',
+        if (isStore) '--store',
+        if (publisher != null) ...['--publisher', publisher!],
+        if (identityName != null) ...['--identity-name', identityName!],
+        if (publisherDisplayName != null) ...[
+          '--publisher-display-name',
+          publisherDisplayName!,
+        ],
         if (certificateFile != null) ...[
           '--certificate-path',
           certificateFile.path,
         ],
-        if (certificatePassword != null) ...[
+        if (certificateFile != null && certificatePassword != null) ...[
           '--certificate-password',
           certificatePassword!,
         ],
