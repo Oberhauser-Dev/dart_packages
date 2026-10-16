@@ -13,11 +13,11 @@ import 'build.dart';
 const commandPublish = 'publish';
 const argPublishStage = 'stage';
 const argDryRun = 'dry-run';
+const argReleaseStatus = 'release-status';
 
 // Publish: Google Play
 const commandAndroidGooglePlay = 'android-google-play';
 const argFastlaneSecretsJsonBase64 = 'fastlane-secrets-json-base64';
-const argAndroidReleaseStatus = 'release-status';
 
 // Publish: iOS App Store
 const commandIosAppStore = 'ios-app-store';
@@ -42,6 +42,17 @@ const argWebSshUser = 'ssh-user';
 const argWebSshPrivateKeyBase64 = 'ssh-private-key-base64';
 const argWebSshPrivateKeyPassphrase = 'ssh-private-key-passphrase';
 
+// Publish: Microsoft Store
+const commandWindowsMsStore = 'windows-ms-store';
+const argMsStoreTenantId = 'tenant-id';
+const argMsStoreClientId = 'client-id';
+const argMsStoreClientSecret = 'client-secret';
+const argMsStoreSellerId = 'seller-id';
+const argMsStoreProductId = 'product-id';
+const argMsStoreFlightId = 'flight-id';
+const argMsStoreRolloutPercentage = 'rollout-percentage';
+const argMsStorePackage = 'package';
+
 class PublishCommand extends Command {
   @override
   final name = commandPublish;
@@ -51,6 +62,7 @@ class PublishCommand extends Command {
   PublishCommand() {
     addSubcommand(PublishAndroidGooglePlayCommand());
     addSubcommand(PublishIosAppStoreCommand());
+    addSubcommand(PublishWindowsMsStoreCommand());
     addSubcommand(PublishWebServerCommand());
   }
 }
@@ -118,7 +130,7 @@ class PublishAndroidGooglePlayCommand extends CommonPublishCommand {
   PublishAndroidGooglePlayCommand() {
     AndroidBuildCommand.addAndroidBuildArgs(argParser);
     argParser.addOption(argFastlaneSecretsJsonBase64, mandatory: true);
-    argParser.addOption(argAndroidReleaseStatus);
+    argParser.addOption(argReleaseStatus);
   }
 
   @override
@@ -135,7 +147,7 @@ class PublishAndroidGooglePlayCommand extends CommonPublishCommand {
       keyAlias: results[argKeyAlias] as String?,
       keyPassword: results[argKeyPassword] as String?,
     );
-    final releaseStatusStr = results[argAndroidReleaseStatus] as String?;
+    final releaseStatusStr = results[argReleaseStatus] as String?;
 
     return AndroidGooglePlayDistributor(
       flutterPublish: flutterPublish,
@@ -207,6 +219,85 @@ class PublishIosAppStoreCommand extends CommonPublishCommand {
       updateProvisioning:
           bool.parse(results[argIosUpdateProvisioning] ?? 'false'),
       xcodeScheme: results[argXcodeScheme] as String?,
+    );
+  }
+}
+
+class PublishWindowsMsStoreCommand extends CommonPublishCommand {
+  @override
+  final name = commandWindowsMsStore;
+  @override
+  final description = 'Publish the app on Microsoft Store.';
+
+  PublishWindowsMsStoreCommand() {
+    argParser
+      ..addOption(argMsStoreTenantId, mandatory: true)
+      ..addOption(argMsStoreClientId, mandatory: true)
+      ..addOption(
+        argMsStoreClientSecret,
+        mandatory: true,
+        help: 'The key of the Microsoft Entra application in Partner Center.',
+      )
+      ..addOption(argMsStoreSellerId, mandatory: true)
+      ..addOption(
+        argMsStoreProductId,
+        mandatory: true,
+        help:
+            'The Store id (e.g. 9N...), see Partner Center > Product identity.',
+      )
+      ..addMultiOption(
+        argMsStorePackage,
+        help: 'The MSIX packages (e.g. one per architecture) built via '
+            '`build msix --store`. Multiple packages are published as bundle. '
+            'Takes the packages of the app version in the release folder by default.',
+      )
+      ..addOption(
+        argMsStoreFlightId,
+        help: 'The package flight, publishes to the public by default.',
+      )
+      ..addOption(
+        argMsStoreRolloutPercentage,
+        help: 'The rollout percentage of the package (0-100).',
+      )
+      ..addOption(
+        argReleaseStatus,
+        allowed: WindowsReleaseStatus.values.map((s) => s.name),
+        defaultsTo: WindowsReleaseStatus.draft.name,
+        help: 'The status of the submission, '
+            '"${WindowsReleaseStatus.completed.name}" submits it for certification.',
+      );
+  }
+
+  @override
+  PublishDistributor getPublishDistributor({
+    required ArgResults results,
+    required FlutterPublish flutterPublish,
+    required FlutterBuild flutterBuild,
+  }) {
+    // Not built, only used for the app version.
+    final platformBuild = WindowsPlatformBuild(
+      buildType: BuildType.msix,
+      flutterBuild: flutterBuild,
+      isStore: true,
+    );
+    final rolloutPercentageStr =
+        results[argMsStoreRolloutPercentage] as String?;
+
+    return WindowsMsStoreDistributor(
+      flutterPublish: flutterPublish,
+      platformBuild: platformBuild,
+      tenantId: results[argMsStoreTenantId] as String,
+      clientId: results[argMsStoreClientId] as String,
+      clientSecret: results[argMsStoreClientSecret] as String,
+      sellerId: results[argMsStoreSellerId] as String,
+      productId: results[argMsStoreProductId] as String,
+      packages: results[argMsStorePackage] as List<String>,
+      flightId: results[argMsStoreFlightId] as String?,
+      packageRolloutPercentage: rolloutPercentageStr == null
+          ? null
+          : double.parse(rolloutPercentageStr),
+      releaseStatus: WindowsReleaseStatus.values
+          .byName(results[argReleaseStatus] as String),
     );
   }
 }
