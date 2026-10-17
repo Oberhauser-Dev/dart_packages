@@ -1,3 +1,9 @@
+## 0.3.7
+
+ - **FEAT**: Add Microsoft Store publish distributor. ([94505e60](https://github.com/Oberhauser-Dev/dart_packages/commit/94505e6064c9d56fbd0aae2215c5b452d904d810))
+ - **FEAT**: Add support for Windows MSIX Store build. ([0f7d10e9](https://github.com/Oberhauser-Dev/dart_packages/commit/0f7d10e9aca135a3202bbc17b277dc67ccdbf505))
+ - **FEAT**: Add support for Windows MSIX build. ([6b4c1584](https://github.com/Oberhauser-Dev/dart_packages/commit/6b4c15848c9479f19477d216a5079506318d6327))
+
 ## 0.3.6+1
 
  - **FIX**: Ignore unrelated dump on Gradle printApplicationId task ([#61](https://github.com/Oberhauser-Dev/dart_packages/issues/61)). ([9547dacf](https://github.com/Oberhauser-Dev/dart_packages/commit/9547dacfec575af15a334a07b38c1a0712137ff1))

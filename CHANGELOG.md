@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-10-17
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`dart_release` - `v0.2.12+2`](#dart_release---v02122)
+ - [`flutter_release` - `v0.3.7`](#flutter_release---v037)
+
+---
+
+#### `dart_release` - `v0.2.12+2`
+
+ - **FIX**: Wait for the remaining output of async processes. ([a6ca9084](https://github.com/Oberhauser-Dev/dart_packages/commit/a6ca908495fa262c2aa263f64529957e0f1290f9))
+
+#### `flutter_release` - `v0.3.7`
+
+ - **FEAT**: Add Microsoft Store publish distributor. ([94505e60](https://github.com/Oberhauser-Dev/dart_packages/commit/94505e6064c9d56fbd0aae2215c5b452d904d810))
+ - **FEAT**: Add support for Windows MSIX Store build. ([0f7d10e9](https://github.com/Oberhauser-Dev/dart_packages/commit/0f7d10e9aca135a3202bbc17b277dc67ccdbf505))
+ - **FEAT**: Add support for Windows MSIX build. ([6b4c1584](https://github.com/Oberhauser-Dev/dart_packages/commit/6b4c15848c9479f19477d216a5079506318d6327))
+
+
 ## 2026-10-12
 
 ### Changes
