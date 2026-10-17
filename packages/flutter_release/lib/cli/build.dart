@@ -9,13 +9,21 @@ import 'package:flutter_release/flutter_release.dart';
 // Common
 const argBuildVersion = 'build-version';
 const argFlavor = 'flavor';
+const argFlutterSdkPath = 'flutter-sdk-path';
 
 // Build Android
 const argKeyStoreFileBase64 = 'keystore-file-base64';
 const argKeyStorePassword = 'keystore-password';
 const argKeyAlias = 'key-alias';
 const argKeyPassword = 'key-password';
-const argFlutterSdkPath = 'flutter-sdk-path';
+
+// Build Windows MSIX
+const argCertificateFileBase64 = 'certificate-file-base64';
+const argCertificatePassword = 'certificate-password';
+const argStore = 'store';
+const argPublisher = 'publisher';
+const argIdentityName = 'identity-name';
+const argPublisherDisplayName = 'publisher-display-name';
 
 class BuildCommand extends Command {
   @override
@@ -29,6 +37,7 @@ class BuildCommand extends Command {
     addSubcommand(IosIpaBuildCommand());
     addSubcommand(IosAppBuildCommand());
     addSubcommand(WindowsBuildCommand());
+    addSubcommand(WindowsMsixBuildCommand());
     addSubcommand(LinuxBuildCommand());
     addSubcommand(DebianBuildCommand());
     addSubcommand(WebBuildCommand());
@@ -139,6 +148,57 @@ class WindowsBuildCommand extends CommonBuildCommand {
     return WindowsPlatformBuild(
       buildType: buildType,
       flutterBuild: flutterBuild,
+    );
+  }
+}
+
+class WindowsMsixBuildCommand extends CommonBuildCommand {
+  static void addWindowsMsixBuildArgs(ArgParser argParser) {
+    argParser
+      ..addOption(argCertificateFileBase64)
+      ..addOption(argCertificatePassword)
+      ..addFlag(
+        argStore,
+        help: 'Build an unsigned installer for the Microsoft Store, '
+            'requires a publisher.',
+      )
+      ..addOption(
+        argPublisher,
+        help:
+            'The publisher (e.g. CN=...). Must match the certificate subject when signing.',
+      )
+      ..addOption(
+        argIdentityName,
+        help: 'The identity name.',
+      )
+      ..addOption(
+        argPublisherDisplayName,
+        help: 'The display name of the publisher.',
+      );
+  }
+
+  @override
+  final description = 'Build the app as Windows MSIX installer.';
+
+  @override
+  BuildType buildType = BuildType.msix;
+
+  WindowsMsixBuildCommand() {
+    addWindowsMsixBuildArgs(argParser);
+  }
+
+  @override
+  PlatformBuild getPlatformBuild(
+      ArgResults results, FlutterBuild flutterBuild) {
+    return WindowsPlatformBuild(
+      buildType: buildType,
+      flutterBuild: flutterBuild,
+      certificateFileBase64: results[argCertificateFileBase64] as String?,
+      certificatePassword: results[argCertificatePassword] as String?,
+      isStore: results[argStore] as bool,
+      publisher: results[argPublisher] as String?,
+      identityName: results[argIdentityName] as String?,
+      publisherDisplayName: results[argPublisherDisplayName] as String?,
     );
   }
 }

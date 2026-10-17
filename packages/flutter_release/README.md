@@ -52,7 +52,7 @@ Options:
 - `app-name`: The name of the app executable
 - `app-version`: Semantic version of the release (like `v1.2.3`), see https://semver.org/
 - `build-metadata`: Specify the build number (also used as version code for Android, but is handled automatically)
-- `build-type`: Release one of the following options: `apk`, `web`, `ipk`, `macos`, `windows`, `debian`
+- `build-type`: Release one of the following options: `apk`, `web`, `ipk`, `macos`, `windows`, `msix`, `debian`
 - `build-arg`: Add options such as `--dart-define` to the flutter build command
 
 Flags:
@@ -60,10 +60,10 @@ Flags:
 
 ## Supported Features
 
-| Platform    | Android |               | iOS             | web          | Windows           | macOS           | Linux   |          |
-|-------------|---------|---------------|-----------------|--------------|-------------------|-----------------|---------|----------|
-| **Build**   | apk ✓   | aab ✓         | ipa ❌           | web ✓        | windows ✓         | macos ✓         | linux ✓ | debian ✓ |
-| **Publish** |         | Google Play ✓ | iOS App Store ✓ | Web Server ✓ | Microsoft Store ❌ | Mac App Store ❌ | Snap ❌  | Ubuntu ❌ |
+| Platform    | Android |               | iOS             | web          | Windows           |        | macOS           | Linux   |          |
+|-------------|---------|---------------|-----------------|--------------|-------------------|--------|-----------------|---------|----------|
+| **Build**   | apk ✓   | aab ✓         | ipa ❌           | web ✓        | windows ✓         | msix ✓ | macos ✓         | linux ✓ | debian ✓ |
+| **Publish** |         | Google Play ✓ | iOS App Store ✓ | Web Server ✓ | Microsoft Store ✓ |        | Mac App Store ❌ | Snap ❌  | Ubuntu ❌ |
 
 Support for other app distributors is planned.
 
@@ -163,6 +163,77 @@ To create additional provisioning profiles, run in the `ios` directory:
 ```
 fastlane sigh -a com.example.ios.to.be.added --api_key_path ApiAuth.json
 ```
+
+### Windows - MSIX installer
+
+The MSIX installer is created via the [msix](https://pub.dev/packages/msix) package.
+Configure it in the `msix_config` section of your `pubspec.yaml`, e.g.:
+
+```yaml
+msix_config:
+  display_name: Example
+  logo_path: assets/images/logo.png
+```
+
+The version is derived from the app version (`a.b.c.0`), the architecture from the build machine.
+To sign the installer, pass your certificate:
+
+```powershell
+flutter_release build msix `
+  --certificate-file-base64=$([Convert]::ToBase64String([IO.File]::ReadAllBytes((Resolve-Path certificate.pfx)))) `
+  --certificate-password=<mycertificatepassword>
+```
+
+Otherwise, the installer is signed with the test certificate of the msix package, which users have to trust manually.
+
+For the Microsoft Store, build an unsigned installer with the `--store` flag, as the store signs it on submission.
+Take the identity name, the publisher and the publisher display name from the
+[Partner Center](https://partner.microsoft.com/dashboard) (*Product identity*) of your app:
+
+```powershell
+flutter_release build msix --store `
+  --identity-name=Example.ExampleApp `
+  --publisher="CN=00000000-0000-0000-0000-000000000000" `
+  --publisher-display-name="Example Publisher"
+```
+
+Alternatively, set them via `identity_name`, `publisher` and `publisher_display_name` in the `msix_config`.
+
+### Windows - Microsoft Store (via Windows only)
+
+1. Reserve the app name in the [Partner Center](https://partner.microsoft.com/dashboard) and submit the app manually at least once,
+   e.g. with an installer built via `flutter_release build msix --store` (see above).
+2. In *Account settings > Organization profile > Tenants*, associate a Microsoft Entra tenant with your account.
+   If you don't have one, [create a new tenant](https://learn.microsoft.com/windows/apps/publish/partner-center/create-new-azure-ad-tenant) there at no charge.
+3. In *Account settings > User management > Microsoft Entra applications*, create a new Microsoft Entra application
+   (see [Microsoft Store submission API](https://learn.microsoft.com/windows/uwp/monetize/create-and-manage-submissions-using-windows-store-services#how-to-associate-an-azure-ad-application-with-your-partner-center-account)):
+   - Name: e.g. `flutter_release`
+   - Reply URL: e.g. `http://localhost` (not used, but required)
+   - Role: `Developer`
+4. Select the created application and copy the `Tenant ID` and the `Client ID`.
+   Then select *Add new key* and copy the `Key` (as client secret), as it is only shown once.
+   Keys expire, so renew them there in time.
+5. Copy the `Seller ID` from *Account settings > Organization profile > Legal info > Developer*.
+6. Copy the `Store ID` (as product id) from *Product management > Product identity* of your app.
+7. Install the [Microsoft Store Developer CLI](https://apps.microsoft.com/detail/9p53pc5s0phj) (`msstore`).
+8. Build the installers via `flutter_release build msix --store` (see above), e.g. one per architecture on the respective machine.
+   The publish command does not build the app.
+9. Run flutter_release
+   ```powershell
+   flutter_release publish windows-ms-store `
+    --dry-run `
+    --tenant-id=<tenant-id> `
+    --client-id=<client-id> `
+    --client-secret=<key> `
+    --seller-id=<seller-id> `
+    --product-id=<store-id>
+   ```
+   By default, the packages of the app version (`--app-version` or from the `pubspec.yaml`) are taken from `build/releases`.
+   Alternatively, pass them via `--package=<path>` (repeatable).
+   Multiple packages are published at once as `.msixbundle`, using the app version as bundle version.
+   To publish to a [package flight](https://learn.microsoft.com/windows/apps/publish/package-flights), add `--flight-id=<flight-id>`.
+   The submission is kept as draft by default (`--release-status=draft`). To submit it for certification, add `--release-status=completed`.
+   For a gradual rollout, add `--rollout-percentage=<0-100>`.
 
 ### Web - Server (via Debian only)
 
