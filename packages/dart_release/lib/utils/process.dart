@@ -63,7 +63,7 @@ Future<ProcessResult> runAsyncProcess(
   );
 
   final List<String> stdOutLines = [];
-  result.stdout.forEach((line) {
+  final stdOutDone = result.stdout.forEach((line) {
     final stdOutLine = utf8.decode(line);
     if (stdOutLine.isEmpty) return;
     stdOutLines.add(stdOutLine);
@@ -71,7 +71,7 @@ Future<ProcessResult> runAsyncProcess(
   });
 
   final List<String> stdErrLines = [];
-  result.stderr.forEach((line) {
+  final stdErrDone = result.stderr.forEach((line) {
     final stdErrLine = utf8.decode(line);
     if (stdErrLine.isEmpty) return;
     stdErrLines.add(stdErrLine);
@@ -79,6 +79,8 @@ Future<ProcessResult> runAsyncProcess(
   });
 
   final resultCode = await result.exitCode;
+  // Wait for the remaining output, which may arrive after the exit code.
+  await Future.wait([stdOutDone, stdErrDone]);
   if (resultCode != 0) {
     throw Exception('Process "$executable" failed. See log above.');
   }
