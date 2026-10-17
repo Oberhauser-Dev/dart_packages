@@ -1,3 +1,7 @@
+## 0.2.12+2
+
+ - **FIX**: Wait for the remaining output of async processes. ([a6ca9084](https://github.com/Oberhauser-Dev/dart_packages/commit/a6ca908495fa262c2aa263f64529957e0f1290f9))
+
 ## 0.2.12+1
 
  - **FIX**: Avoid empty logs. ([42c8460a](https://github.com/Oberhauser-Dev/dart_packages/commit/42c8460adc2d995889c68303f022c7800b8be9da))
